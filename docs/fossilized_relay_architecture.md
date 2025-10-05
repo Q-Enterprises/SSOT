@@ -137,6 +137,16 @@ Each capsule inherits Governance v6.0 rules: versioned manifests, provenance fie
 
 Treat this registry as the root capsule when orchestrating cross-repo flows—other capsules reference it when they emit motion ledgers, rehearsal streams, or replay tokens.
 
+### 4.6 Scrollstream Rehearsal Capsule
+
+`capsule.rehearsal.scrollstream.v1` stages the Celine → Luma → Dot audit rehearsal loop so contributors can preview the scrollstream braid before a ledger is sealed. The inscription lives at [`capsules/capsule.rehearsal.scrollstream.v1.json`](../capsules/capsule.rehearsal.scrollstream.v1.json) and defines:
+
+- **Cycle discipline**: Immutable ordering (summary → proof → execution) with explicit personas and hand-offs. Each stage emits one ledger line into `scrollstream_ledger`, escalates HUD shimmer intensity, and primes the replay glyph for the next agent.
+- **Ledger contract**: ISO-8601 timestamps, deterministic sparkline digests, emotional payload tags, and Sabrina Spark Test metadata. CI/CD smoke tests call [`scripts/emit_scrollstream_rehearsal.py`](../scripts/emit_scrollstream_rehearsal.py) to emit the governed sample at [`samples/output/scrollstream_rehearsal_loop.json`](../samples/output/scrollstream_rehearsal_loop.json).
+- **Visual feedback**: HUD shimmer confirmation, replay glyph pulses (1.5 Hz), and one-click contributor replay binding so the full lifecycle is visible in the scrollstream rail.
+
+Use this capsule when onboarding contributors or rehearsing ledger emissions—the deterministic payloads let CI validate shimmer cues and replay glyph triggers before the production ledger seals.
+
 ---
 
 ## 5. Orchestration Scripts & Prompts
