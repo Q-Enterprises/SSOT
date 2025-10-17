@@ -1,0 +1,19 @@
+{
+  "stage": "sandbox_model_v1",
+  "subject": "GT3 race car",
+  "inputs": {
+    "photo_hash": "",
+    "prompt_hash": "",
+    "stl_hash": ""
+  },
+  "proof": "sha256:",
+  "flow": {
+    "printer": "PrusaMK4",
+    "duration_min": 0,
+    "material_g": 0
+  },
+  "execution": {
+    "result": "PENDING",
+    "timestamp_utc": ""
+  }
+}
