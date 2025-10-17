@@ -1,0 +1,56 @@
+{
+  "capsule_id": "capsule.patentDraft.qube.v1",
+  "qube": {
+    "p3l_ref": "urn:p3l:phase1:qLock:LiD:QBits",
+    "sr_gate": "v1",
+    "moe_topology": {
+      "experts": "N",
+      "router": "SR",
+      "ab_determinism_seed": "phase1-seed"
+    },
+    "malintent": "BLQB9X/MIT.01",
+    "artifact": {
+      "type": "R0P3",
+      "format": "iRQLxTR33",
+      "packaging_map": [
+        "P3L",
+        "qLock/LiD",
+        "QBits",
+        "SR Gate",
+        "MoE",
+        "BLQB9X",
+        "R0P3"
+      ]
+    }
+  },
+  "lineage": {
+    "qonledge_ref": "urn:qon:phase1:pending",
+    "scrollstream": true,
+    "dual_run": {
+      "mode": "A/B",
+      "seed": "phase1-seed",
+      "delta_emit": true
+    }
+  },
+  "integrity": {
+    "sha256_p3l": "sha256:TODO",
+    "merkle_root": "TODO",
+    "attestation_quorum": "2-of-3"
+  },
+  "governance": {
+    "gates": [
+      "G01-ticket-hash",
+      "G02-fitment",
+      "G03-artifact-hashes",
+      "G04-expected-verify",
+      "SEAL"
+    ]
+  },
+  "meta": {
+    "epoch": "phase.1.x",
+    "issuer": "Council",
+    "policy": "P3L.vX",
+    "issued_at": "ISO-UTC",
+    "notes": "Generated for council staging; fill hashes before seal."
+  }
+}
