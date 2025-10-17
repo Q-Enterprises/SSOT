@@ -3,6 +3,7 @@ import logging
 import os
 import subprocess
 from copy import deepcopy
+from datetime import datetime
 from pathlib import Path
 from time import time
 from typing import Dict, Iterable, List, Literal, Optional, Sequence
@@ -206,6 +207,30 @@ class MediaGenerationRequest(BaseModel):
     )
 
 
+class ScrollstreamRehearsalRequest(BaseModel):
+    """Request payload for emitting the scrollstream rehearsal loop."""
+
+    mode: Literal["live", "deterministic"] = Field(
+        "live",
+        description="Live uses real timestamps; deterministic yields repeatable fixtures",
+    )
+    include_hud: bool = Field(
+        True,
+        description="Toggle HUD shimmer metadata in the response payload",
+    )
+
+
+class ScrollstreamRehearsalEvent(BaseModel):
+    """Response event describing a single rehearsal phase."""
+
+    phase: Literal["audit.summary", "audit.proof", "audit.execution"]
+    agent: Literal["Celine", "Luma", "Dot"]
+    role: Literal["Architect", "Sentinel", "Guardian"]
+    output: str
+    sabrina_spark: Literal["pass"] = "pass"
+    emotional_payload: str
+
+
 app = FastAPI()
 
 # Load the avatar registry into memory at startup. This registry is
@@ -214,6 +239,19 @@ _registry_path = Path(__file__).resolve().parent / "avatar_registry.json"
 AVATAR_REGISTRY = AvatarRegistry(_registry_path)
 _seal_script_path = Path(__file__).resolve().parent / "ops" / "v7_seal_root.sh"
 MERKLE_ORCHESTRATOR = MerkleSealOrchestrator(_seal_script_path)
+_ledger_path = Path(__file__).resolve().parent / "scrollstream_ledger.jsonl"
+
+
+def _iso_timestamp() -> str:
+    """Return the current UTC timestamp with second precision."""
+
+    return datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+
+
+def _deterministic_timestamp() -> str:
+    """Return a stable timestamp used for deterministic rehearsal runs."""
+
+    return "2025-01-01T00:00:00Z"
 
 @app.get("/health")
 def health_check():
@@ -331,6 +369,85 @@ def media_generate(request: MediaGenerationRequest):
     }
     if request.metadata:
         response["metadata"] = request.metadata
+    return response
+
+
+@app.post("/rehearsal/scrollstream")
+def scrollstream_rehearsal(payload: ScrollstreamRehearsalRequest):
+    """Emit the scrollstream rehearsal braid and append ledger events."""
+
+    timestamp_factory = (
+        _deterministic_timestamp if payload.mode == "deterministic" else _iso_timestamp
+    )
+
+    events: List[ScrollstreamRehearsalEvent] = [
+        ScrollstreamRehearsalEvent(
+            phase="audit.summary",
+            agent="Celine",
+            role="Architect",
+            output=(
+                "Celine threads the audit synopsis, aligning wind vectors with "
+                "capsule intent for contributors to replay."
+            ),
+            emotional_payload="focused-calm",
+        ),
+        ScrollstreamRehearsalEvent(
+            phase="audit.proof",
+            agent="Luma",
+            role="Sentinel",
+            output=(
+                "Luma illuminates the proof lattice, casting post-entropy light "
+                "across the rehearsal weave."
+            ),
+            emotional_payload="uplifted-clarity",
+        ),
+        ScrollstreamRehearsalEvent(
+            phase="audit.execution",
+            agent="Dot",
+            role="Guardian",
+            output=(
+                "Dot seals the execution strand, void-resetting drift while "
+                "preserving the braid path."
+            ),
+            emotional_payload="stoic-assurance",
+        ),
+    ]
+
+    ledger_records = []
+    for event in events:
+        record = {
+            "t": timestamp_factory(),
+            "capsule": "capsule.rehearsal.scrollstream.v1",
+            "phase": event.phase,
+            "agent": event.agent,
+            "role": event.role,
+            "output": event.output,
+        }
+        ledger_records.append(record)
+
+    if ledger_records:
+        _ledger_path.parent.mkdir(parents=True, exist_ok=True)
+        with _ledger_path.open("a", encoding="utf-8") as ledger_file:
+            for record in ledger_records:
+                ledger_file.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+    response = {
+        "capsule": "capsule.rehearsal.scrollstream.v1",
+        "mode": payload.mode,
+        "events": [event.dict() for event in events],
+        "ledger": {
+            "path": str(_ledger_path),
+            "appended": len(ledger_records),
+        },
+    }
+
+    if payload.include_hud:
+        response["hud"] = {
+            "shimmer": True,
+            "replay_glyph": "scrollstream.replay.pulse",
+            "qlock": "tick",
+        }
+
     return response
 
 @app.post("/qbot/credentials")
