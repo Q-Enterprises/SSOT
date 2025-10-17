@@ -5,7 +5,7 @@ import subprocess
 from copy import deepcopy
 from pathlib import Path
 from time import time
-from typing import Dict, Iterable, List, Optional, Sequence
+from typing import Dict, Iterable, List, Literal, Optional, Sequence
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel, Field
@@ -192,6 +192,20 @@ class MerkleSealRequest(BaseModel):
     )
 
 
+class MediaGenerationRequest(BaseModel):
+    """Request payload for synthetic media generation."""
+
+    prompt: str = Field(..., min_length=1, description="User supplied creative prompt")
+    media_type: Literal["video", "Video"] = Field(
+        "video",
+        description="Type of media requested; only video is supported",
+    )
+    metadata: Optional[Dict[str, object]] = Field(
+        default=None,
+        description="Optional metadata describing render preferences",
+    )
+
+
 app = FastAPI()
 
 # Load the avatar registry into memory at startup. This registry is
@@ -296,6 +310,28 @@ def merkle_seal(payload: MerkleSealRequest):
         "orchestrated": True,
         "result": result,
     }
+
+
+@app.post("/media/generate")
+def media_generate(request: MediaGenerationRequest):
+    """Handle synthetic media requests with explicit video-only support."""
+
+    normalized_type = request.media_type.lower()
+    if normalized_type != "video":
+        raise HTTPException(
+            status_code=400,
+            detail="I can only generate videos. Try another prompt.",
+        )
+
+    response = {
+        "accepted": True,
+        "media_type": "video",
+        "status": "queued",
+        "prompt": request.prompt,
+    }
+    if request.metadata:
+        response["metadata"] = request.metadata
+    return response
 
 @app.post("/qbot/credentials")
 async def credential_checker(request: Request):
