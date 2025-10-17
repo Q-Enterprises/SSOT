@@ -1,11 +1,14 @@
+import json
+import logging
+import os
+import subprocess
 from copy import deepcopy
 from pathlib import Path
 from time import time
 from typing import Dict, Iterable, List, Optional, Sequence
-import json
-import logging
 
 from fastapi import FastAPI, HTTPException, Query, Request
+from pydantic import BaseModel, Field
 
 from codex_validator import Credential, OverrideRequest, validate_payload
 
@@ -117,12 +120,86 @@ class AvatarRegistry:
         return sorted(domains)
 
 
+class MerkleSealOrchestrator:
+    """Automate Merkle sealing by invoking the Boo council helper script."""
+
+    def __init__(self, script_path: Path) -> None:
+        self._script_path = script_path
+
+    def _ensure_available(self) -> None:
+        if not self._script_path.exists():
+            raise FileNotFoundError(f"Seal helper missing at {self._script_path}")
+        if not os.access(self._script_path, os.X_OK):
+            raise PermissionError(f"Seal helper is not executable: {self._script_path}")
+
+    def seal(
+        self,
+        merkle_root: str,
+        capsule_id: str,
+        metadata: Optional[Dict[str, object]] = None,
+    ) -> Dict[str, object]:
+        """Invoke the helper script and return execution metadata."""
+
+        self._ensure_available()
+        command = [str(self._script_path), merkle_root, capsule_id]
+        env = os.environ.copy()
+        if metadata:
+            env["MERKLE_METADATA"] = json.dumps(metadata)
+
+        result = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+
+        if result.returncode != 0:
+            raise RuntimeError(
+                "Seal helper failed",
+                {
+                    "returncode": result.returncode,
+                    "stdout": result.stdout,
+                    "stderr": result.stderr,
+                },
+            )
+
+        return {
+            "capsule": capsule_id,
+            "merkle_root": merkle_root,
+            "stdout": result.stdout.strip(),
+            "stderr": result.stderr.strip(),
+            "script": str(self._script_path),
+        }
+
+
+class MerkleSealRequest(BaseModel):
+    """Request payload for triggering a Merkle seal."""
+
+    merkle_root: str = Field(
+        ...,
+        min_length=1,
+        description="Newly computed Merkle root digest",
+    )
+    capsule_id: str = Field(
+        "capsule.council.boo.agency.v7",
+        min_length=1,
+        description="Capsule identifier to bind the seal to",
+    )
+    metadata: Optional[Dict[str, object]] = Field(
+        default=None,
+        description="Optional metadata passed to the seal helper via MERKLE_METADATA",
+    )
+
+
 app = FastAPI()
 
 # Load the avatar registry into memory at startup. This registry is
 # treated as read-only and anchors avatar logic to the DimIndex scroll.
 _registry_path = Path(__file__).resolve().parent / "avatar_registry.json"
 AVATAR_REGISTRY = AvatarRegistry(_registry_path)
+_seal_script_path = Path(__file__).resolve().parent / "ops" / "v7_seal_root.sh"
+MERKLE_ORCHESTRATOR = MerkleSealOrchestrator(_seal_script_path)
 
 @app.get("/health")
 def health_check():
@@ -197,6 +274,28 @@ async def webhook_handler(request: Request):
     """
     payload = await request.json()
     return {"received": True, "event": payload.get("action", "unknown")}
+
+
+@app.post("/merkle/seal")
+def merkle_seal(payload: MerkleSealRequest):
+    """Trigger the Boo council seal helper via the Merkle orchestrator."""
+
+    try:
+        result = MERKLE_ORCHESTRATOR.seal(
+            payload.merkle_root,
+            payload.capsule_id,
+            payload.metadata,
+        )
+    except (FileNotFoundError, PermissionError) as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        _, details = exc.args
+        raise HTTPException(status_code=502, detail=details) from exc
+
+    return {
+        "orchestrated": True,
+        "result": result,
+    }
 
 @app.post("/qbot/credentials")
 async def credential_checker(request: Request):
