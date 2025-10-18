@@ -74,6 +74,16 @@ class RegistryEntry(BaseModel):
 
     @validator("entry_type")
     def validate_entry_type(cls, value: str) -> str:
+        allowed = {
+            "asset",
+            "checkpoint",
+            "clip",
+            "design",
+            "relay",
+            "script",
+            "simulation",
+            "storyboard",
+        }
         allowed = {"script", "storyboard", "asset", "clip", "checkpoint"}
         if value not in allowed:
             raise ValueError(f"entry type '{value}' is not part of the canonical binder")
