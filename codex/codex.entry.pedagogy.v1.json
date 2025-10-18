@@ -1,0 +1,97 @@
+{
+  "codex": {
+    "id": "codex.entry.pedagogy",
+    "version": "v1",
+    "title": "Sol Ignition Pedagogy Loop",
+    "summary": "Lineage-bound doctrine capturing the Sol Ignition Protocol rehearsal loop anchored by Boo's router authority and CiCi's stabilizer cadence.",
+    "guardians": [
+      "queen_boo_router",
+      "cici_stabilizer",
+      "sol_f1_previz"
+    ],
+    "sealedAt": "2025-09-24T10:34:00Z"
+  },
+  "lineage": {
+    "pedagogyLoop": "capsule.relay.scene.fork.v3",
+    "adjudicationCapsule": "capsule.adjudicate.monza.v1",
+    "scriptCapsule": "capsule.script.qube.cinematic.v1",
+    "storyboardCapsule": "storyboard.monza.grid.v1",
+    "attestations": [
+      {
+        "artifact": "assets.monza.abs_livery.v1",
+        "signers": ["queen_boo_router"],
+        "sha256": "immutable"
+      },
+      {
+        "artifact": "clip.monza.launch.v1",
+        "signers": ["queen_boo_router", "sol_f1_previz"],
+        "sha256": "co_attested"
+      }
+    ]
+  },
+  "doctrine": {
+    "objective": "Encode the Sol Ignition Protocol as a sovereign training loop that guides contributors through motion, echo, and cinematic scripture.",
+    "inputs": [
+      {
+        "capsule": "capsule.motion.ledger.v2",
+        "role": "HUD telemetry",
+        "frequencyHz": 30
+      },
+      {
+        "capsule": "capsule.echo.scrollstream.v2",
+        "role": "emotional verse",
+        "frequencyHz": 30
+      }
+    ],
+    "hudOverlays": ["glyph.pulse", "aura.gold", "qlock.tick", "drift.delta"],
+    "poseLock": {
+      "schema": "3q-window-stance",
+      "toleranceDegrees": 4
+    }
+  },
+  "rehearsal": {
+    "cadenceHz": 30,
+    "qlock": {
+      "anchorIntervalSeconds": 3,
+      "driftThreshold": 0.01
+    },
+    "timeline": {
+      "ordered": true,
+      "nonOverlap": true
+    }
+  },
+  "validation": {
+    "checks": [
+      "timeline_ordered",
+      "no_overlap",
+      "qlock_alignment",
+      "drift_delta_below_threshold",
+      "pose_lock_verified"
+    ],
+    "result": "pass"
+  },
+  "fossilization": {
+    "hashing": "BODY_ONLY",
+    "merkle": "qlock_chunked",
+    "sceneRootDigest": "sha256:4a02d8f9e1c3b5a7e6f8a9b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1"
+  },
+  "emissions": {
+    "replayToken": "capsule.replay.token.v2",
+    "pedagogyLedger": "ledger.pedagogy.v1",
+    "hudStream": true,
+    "auditReady": true
+  },
+  "propagation": {
+    "nextActions": [
+      {
+        "capsule": "capsule.broadcast.v1",
+        "purpose": "Propagate pedagogy loop to runtime partners"
+      }
+    ],
+    "access": {
+      "guild": "GOODNOOD",
+      "licensing": "sovereign",
+      "rehearsal": "permitted"
+    }
+  }
+}

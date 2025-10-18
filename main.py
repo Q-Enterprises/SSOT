@@ -1,14 +1,67 @@
-from fastapi import FastAPI, HTTPException, Request
+import json
+import json
 from pathlib import Path
 from time import time
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
+from pathlib import Path
+from time import time
+from ipaddress import ip_address, ip_network
 import json
+from ipaddress import ip_address, ip_network
 
 from codex_validator import Credential, OverrideRequest, validate_payload
 from orchestrator.config import CAPSULE as ORCHESTRATOR_CAPSULE, FlowSubmission
 from previz.ledger import LIBRARY
+from previz.world_engine import WorldEngine
+from screenplay import LIBRARY as SCREENPLAY_LIBRARY
 from ssot.binder import binder
 
 app = FastAPI()
+
+WORLD_ENGINE = WorldEngine()
+
+# Network block list enforcing council security guidance.
+_BLOCKED_NETWORKS = tuple(
+    ip_network(value)
+    for value in (
+        "3.134.238.10/32",
+        "3.129.111.220/32",
+        "52.15.118.168/32",
+        "74.220.50.0/24",
+        "74.220.58.0/24",
+    )
+)
+
+_BLOCKED_NETWORKS = [
+    ip_network("3.134.238.10/32"),
+    ip_network("3.129.111.220/32"),
+    ip_network("52.15.118.168/32"),
+    ip_network("74.220.50.0/24"),
+    ip_network("74.220.58.0/24"),
+]
+
+
+@app.middleware("http")
+async def blocklisted_ip_guard(request: Request, call_next):
+    """Reject requests originating from blocklisted IP ranges."""
+
+    client_host = request.client.host if request.client else None
+    if client_host:
+        try:
+            client_ip = ip_address(client_host)
+        except ValueError:
+            client_ip = None
+        if client_ip:
+            for network in _BLOCKED_NETWORKS:
+                if client_ip in network:
+                    return JSONResponse(
+                        {"detail": "Access denied from blocked network"},
+                        status_code=403,
+                    )
+    return await call_next(request)
 
 # Load the avatar registry into memory at startup. This registry is
 # treated as read-only and anchors avatar logic to the DimIndex scroll.
@@ -24,6 +77,22 @@ except FileNotFoundError:
 def health_check():
     """Return a simple JSON status to indicate service liveness."""
     return {"status": "alive"}
+
+
+@app.middleware("http")
+async def enforce_blocklist(request: Request, call_next):
+    """Deny access to requests originating from blocked networks."""
+
+    client = request.client
+    if client and client.host:
+        try:
+            client_ip = ip_address(client.host)
+        except ValueError:
+            client_ip = None
+        if client_ip and any(client_ip in network for network in _BLOCKED_NETWORKS):
+            raise HTTPException(status_code=403, detail="request blocked")
+    response = await call_next(request)
+    return response
 
 
 @app.get("/healthz")
@@ -137,6 +206,32 @@ async def orchestrator_route(request: Request):
     return result
 
 
+@app.get("/screenplay/capsules")
+def screenplay_capsules():
+    """List screenplay capsules anchoring sovereign relays."""
+
+    capsules = []
+    for summary in SCREENPLAY_LIBRARY.list_capsules():
+        capsules.append({
+            "capsule_id": summary.capsule_id,
+            "metadata": summary.metadata,
+        })
+    return {"capsules": capsules, "count": len(capsules)}
+
+
+@app.get("/screenplay/capsules/{capsule_id}")
+def screenplay_capsule(capsule_id: str):
+    """Return a screenplay capsule payload by id."""
+
+    try:
+        capsule = SCREENPLAY_LIBRARY.get_capsule(capsule_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    payload = capsule.dict()
+    payload["execution_tree"] = capsule.execution_tree()
+    return payload
+
+
 @app.get("/previz/ledgers")
 def previz_ledgers():
     """List available PreViz ledgers with summary metadata."""
@@ -159,3 +254,13 @@ def previz_ledger(scene: str):
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return ledger.dict()
+
+
+@app.post("/previz/render")
+async def previz_render(request: Request):
+    """Route media requests through the WorldEngine simulation."""
+
+    payload = await request.json()
+    media_type = payload.get("media_type", "video")
+    prompt = payload.get("prompt")
+    return WORLD_ENGINE.request_media(media_type, prompt)

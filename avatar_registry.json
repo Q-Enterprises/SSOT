@@ -14,6 +14,16 @@
       "roles": ["previz", "animatics"],
       "signature": "sig:sol_f1_previz",
       "description": "Generates motion ledgers and dispatches clip jobs."
+    },
+    "packnet": {
+      "roles": ["simulation_mapper", "workflow_visualizer"],
+      "signature": "sig:packnet_mapper",
+      "description": "Maps relay graphs into PackNet rehearsal overlays for verification."
+    },
+    "tams": {
+      "roles": ["audit_overlay", "tempo_anchor"],
+      "signature": "sig:tams_auditor",
+      "description": "Stabilizes rehearsal tempo and logs PackNet/TAMS snapshots to the SSOT."
     }
   }
 }
