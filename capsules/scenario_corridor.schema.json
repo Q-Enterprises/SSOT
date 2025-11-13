@@ -1,0 +1,41 @@
+{
+  "capsule_id": "scenario.corridor.v1",
+  "sealed_at": "2025-11-13T15:45:00Z",
+  "event": "SCENARIO_CHAIN",
+  "lineage": [
+    {
+      "stage": "RISK",
+      "ref": "digest:<RISK_EVENT_HEX>",
+      "description": "Initial fracture detected; orthogonality below threshold."
+    },
+    {
+      "stage": "ENFORCEMENT",
+      "ref": "digest:<ATTESTATION_HEX>",
+      "description": "Council attestation capsule sealed; corrective fossil inscribed."
+    },
+    {
+      "stage": "GROWTH",
+      "ref": "digest:<GROWTH_PROPOSAL_HEX>",
+      "description": "Proposal for cohesion lift; apprentices deliberate uplift."
+    }
+  ],
+  "digest": {
+    "alg": "sha256",
+    "hex": "<PLACEHOLDER_HEX>"
+  },
+  "signature": {
+    "alg": "ed25519",
+    "pubkey_ref": "capsule.pub",
+    "sig_b64": "<PLACEHOLDER_SIG>"
+  },
+  "metadata": {
+    "signer_id": "QCouncil",
+    "policy": "council.scenario.v1",
+    "tags": [
+      "SCENARIO-CHAIN",
+      "RISK",
+      "ENFORCEMENT",
+      "GROWTH"
+    ]
+  }
+}
