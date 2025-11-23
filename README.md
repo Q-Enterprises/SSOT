@@ -14,7 +14,7 @@ You’ve already pinned the Proof → Flow → Execution braid. Here’s the fin
 - **Proof (SSOT registry):** Offline, private vault for every artifact—scripts, storyboards, assets, clips, and avatar checkpoints—sealed with SHA-256, Merkle lineage, and council signatures. Maker–checker and quorum rules govern replay and forks. This is your meta-level lead mechanism; Sol.F1 is the runtime bus that carries sealed decisions into operations.
 
 - **Flow (Core orchestrator):** Policy-as-code router. Queen Boo enforces routing/quorum, CiCi stabilizes emotional payload, Dot audits and rollback routes, Luma conducts the cascade and observability. Sol.F1 receives the sealed quorum packet and fans directives across verticals (ADAPTCO, Q.Enterprises, Macchina Soulutions).
-- **Ingress guard:** The FastAPI capsule now blocks traffic from known-hostile ranges (3.134.238.10, 3.129.111.220, 52.15.118.168, 74.220.50.0/24, 74.220.58.0/24) so the relay only accepts council-approved ingress.
+- **Ingress guard (planned):** The FastAPI capsule currently exposes the relay routes without IP filtering or firewall middleware; operators must place it behind their existing edge controls (WAF, security groups, allowlists) until ingress policies are added to the codebase.
 
 - **Execution (Sol.F1 PreViz + clip engines):** Sol.F1 emits motion ledgers and animatics from storyboard capsules, delegates 5–10s clip jobs to Sora (or alternates like Runway/Veo), returns fossils to SSOT. Your film suite is then remixable: Entropic Drifts, ADAPTCO learning with LegoF1, CGI fleet drifting—all lineage-bound in SSOT.
 
@@ -49,6 +49,54 @@ You’ve already pinned the Proof → Flow → Execution braid. Here’s the fin
   Purpose: Plates/textures/liveries/podium; material scientist capsule (ABS optics), camera engineer capsule (tilt‑shift math); conditions for clip engines. Quality prep and export discipline follow pro tips for image-to-video stability (consistent source resolution, fixed seeds, high bitrate).
 
 > Codex has live tasks for autocode, registry expansion, film look presets, and CI; wire these skeletons to those tasks so the council can populate capsules without boilerplate.
+
+---
+
+## CI Workflows
+
+### ✅ CI Workflow: Manifest Validation Example
+
+In CI, manifest schema validation is enforced via a Bash step using `ajv-cli`. Here's a real example of how it runs:
+
+```bash
+set -euo pipefail
+trap 'echo "::error::Manifest schema validation failed"' ERR
+
+MANIFEST_PATH="${CONSOLIDATED_MANIFEST:-manifest.json}"
+
+if [ ! -f "$MANIFEST_PATH" ]; then
+  if [ -f samples/manifest.json ]; then
+    echo "::notice::Using samples/manifest.json as fallback"
+    MANIFEST_PATH="samples/manifest.json"
+  else
+    echo "::error::manifest not found at $MANIFEST_PATH"
+    exit 1
+  fi
+fi
+
+npx --yes ajv-cli validate -d "$MANIFEST_PATH"
+```
+
+**Key points:**
+
+* Fails fast (`set -euo pipefail`) and emits GitHub Actions errors for easier debugging.
+* Uses `$CONSOLIDATED_MANIFEST` when provided (e.g., `dist/consolidated-manifest.json`), otherwise defaults to `manifest.json`; falls back to `samples/manifest.json` if present.
+* Uses `ajv-cli` to validate the file against the expected schema.
+* If the file is missing, it raises a CI error (`exit code 1`).
+
+**GitHub Actions context:**
+This is typically embedded in a job like:
+
+```yaml
+jobs:
+  validate-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          set -euo pipefail
+          # [script above]
+```
 
 ---
 
