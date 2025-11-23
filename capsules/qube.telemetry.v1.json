@@ -1,0 +1,1000 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://adaptco.dev/capsules/qube.telemetry.v1.json",
+  "title": "qube.telemetry.v1",
+  "description": "Schema for the Qube telemetry capsule that unifies proof, flow, and execution layer signals into a single cockpit view.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "capsule",
+    "streams",
+    "fields",
+    "dashboards",
+    "alerts"
+  ],
+  "properties": {
+    "capsule": {
+      "type": "object",
+      "title": "Capsule metadata",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "description",
+        "owners",
+        "tags"
+      ],
+      "properties": {
+        "id": {
+          "const": "qube.telemetry"
+        },
+        "version": {
+          "const": "v1"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owners": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "documentation": {
+          "type": "string",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "streams": {
+      "type": "array",
+      "title": "Telemetry sources",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "layer",
+          "description",
+          "ingest",
+          "schema"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_.-]+$"
+          },
+          "layer": {
+            "type": "string",
+            "enum": [
+              "proof",
+              "flow",
+              "execution"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "ingest": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "transport"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "event-stream",
+                  "polling",
+                  "webhook",
+                  "log-ingest"
+                ]
+              },
+              "transport": {
+                "type": "string",
+                "enum": [
+                  "kafka",
+                  "nats",
+                  "sqs",
+                  "https",
+                  "grpc",
+                  "filesystem",
+                  "stdin"
+                ]
+              },
+              "topic": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string",
+                "format": "uri"
+              },
+              "auth": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "secretRef": {
+                    "type": "string"
+                  }
+                }
+              },
+              "pollIntervalSeconds": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
+          "schema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "required",
+              "properties"
+            ],
+            "properties": {
+              "type": {
+                "enum": [
+                  "object"
+                ]
+              },
+              "required": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "properties": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object"
+                }
+              },
+              "additionalProperties": {
+                "type": "boolean"
+              }
+            }
+          },
+          "retention": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "hot": {
+                "type": "string"
+              },
+              "cold": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "fields": {
+      "type": "array",
+      "title": "Telemetry field catalog",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "label",
+          "type",
+          "source",
+          "description"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_.-]+$"
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "integer",
+              "number",
+              "boolean",
+              "timestamp",
+              "duration",
+              "percentage"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "proof",
+              "flow",
+              "execution",
+              "derived"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "lineage": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "derivesFrom": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "transformation": {
+                "type": "string"
+              }
+            }
+          },
+          "slo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "warning": {
+                "type": "number"
+              },
+              "critical": {
+                "type": "number"
+              },
+              "comparator": {
+                "type": "string",
+                "enum": [
+                  "<",
+                  "<=",
+                  ">",
+                  ">=",
+                  "==",
+                  "!="
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "dashboards": {
+      "type": "object",
+      "title": "Visualization layouts",
+      "additionalProperties": false,
+      "required": [
+        "nodeGraph",
+        "widgets"
+      ],
+      "properties": {
+        "nodeGraph": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "nodes",
+            "edges"
+          ],
+          "properties": {
+            "nodes": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "label",
+                  "layer",
+                  "position",
+                  "bindings"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_.-]+$"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "layer": {
+                    "type": "string",
+                    "enum": [
+                      "proof",
+                      "flow",
+                      "execution"
+                    ]
+                  },
+                  "position": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "properties": {
+                      "x": {
+                        "type": "number"
+                      },
+                      "y": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "bindings": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "field",
+                        "aggregation"
+                      ],
+                      "properties": {
+                        "field": {
+                          "type": "string"
+                        },
+                        "aggregation": {
+                          "type": "string",
+                          "enum": [
+                            "latest",
+                            "avg",
+                            "max",
+                            "min",
+                            "sum",
+                            "count",
+                            "percentile"
+                          ]
+                        },
+                        "window": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "edges": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "from",
+                  "to",
+                  "field"
+                ],
+                "properties": {
+                  "from": {
+                    "type": "string"
+                  },
+                  "to": {
+                    "type": "string"
+                  },
+                  "field": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "widgets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "type",
+              "title",
+              "query"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9_.-]+$"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "timeseries",
+                  "table",
+                  "distribution",
+                  "status"
+                ]
+              },
+              "title": {
+                "type": "string"
+              },
+              "query": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "stream",
+                  "window",
+                  "fields"
+                ],
+                "properties": {
+                  "stream": {
+                    "type": "string"
+                  },
+                  "window": {
+                    "type": "string"
+                  },
+                  "fields": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "field",
+                        "aggregation"
+                      ],
+                      "properties": {
+                        "field": {
+                          "type": "string"
+                        },
+                        "aggregation": {
+                          "type": "string",
+                          "enum": [
+                            "latest",
+                            "avg",
+                            "max",
+                            "min",
+                            "sum",
+                            "count"
+                          ]
+                        },
+                        "groupBy": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "filters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "field",
+                        "operator",
+                        "value"
+                      ],
+                      "properties": {
+                        "field": {
+                          "type": "string"
+                        },
+                        "operator": {
+                          "type": "string",
+                          "enum": [
+                            "=",
+                            "!=",
+                            ">",
+                            ">=",
+                            "<",
+                            "<=",
+                            "in",
+                            "contains"
+                          ]
+                        },
+                        "value": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean",
+                            "array"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "alerts": {
+      "type": "array",
+      "title": "Guardrails",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "description",
+          "severity",
+          "conditions"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_.-]+$"
+          },
+          "description": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning",
+              "critical"
+            ]
+          },
+          "conditions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field",
+                "operator",
+                "threshold"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "operator": {
+                  "type": "string",
+                  "enum": [
+                    ">",
+                    ">=",
+                    "<",
+                    "<=",
+                    "==",
+                    "!="
+                  ]
+                },
+                "threshold": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "duration": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "remediation": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "capsule": {
+        "id": "qube.telemetry",
+        "version": "v1",
+        "description": "Live telemetry capsule for the relay triangle",
+        "owners": [
+          "Queen Boo",
+          "CiCi"
+        ],
+        "tags": [
+          "telemetry",
+          "relay-triangle",
+          "cockpit"
+        ],
+        "documentation": "https://docs.adaptco.dev/qube/telemetry",
+        "createdAt": "2025-09-24T00:00:00Z"
+      },
+      "streams": [
+        {
+          "key": "proof.roots",
+          "layer": "proof",
+          "description": "Merkle root seals emitted by the SSOT registry",
+          "ingest": {
+            "kind": "event-stream",
+            "transport": "kafka",
+            "topic": "ssot.roots"
+          },
+          "schema": {
+            "type": "object",
+            "required": [
+              "bundleHash",
+              "merkleRoot",
+              "timestamp"
+            ],
+            "properties": {
+              "bundleHash": {
+                "type": "string"
+              },
+              "merkleRoot": {
+                "type": "string"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        {
+          "key": "flow.orchestrator",
+          "layer": "flow",
+          "description": "Orchestrator checkpoints with avatar activation weights",
+          "ingest": {
+            "kind": "event-stream",
+            "transport": "nats",
+            "topic": "orchestrator.checkpoints"
+          },
+          "schema": {
+            "type": "object",
+            "required": [
+              "bundleHash",
+              "avatar",
+              "alpha",
+              "quorum",
+              "timestamp"
+            ],
+            "properties": {
+              "bundleHash": {
+                "type": "string"
+              },
+              "avatar": {
+                "type": "string"
+              },
+              "alpha": {
+                "type": "number"
+              },
+              "quorum": {
+                "type": "number"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        {
+          "key": "execution.ledger",
+          "layer": "execution",
+          "description": "Acknowledgements from Sol.F1 motion ledgers",
+          "ingest": {
+            "kind": "webhook",
+            "transport": "https",
+            "uri": "https://solf1.adaptco.dev/hooks/ack"
+          },
+          "schema": {
+            "type": "object",
+            "required": [
+              "bundleHash",
+              "frame",
+              "replayToken",
+              "latencyMs",
+              "timestamp"
+            ],
+            "properties": {
+              "bundleHash": {
+                "type": "string"
+              },
+              "frame": {
+                "type": "integer"
+              },
+              "replayToken": {
+                "type": "string"
+              },
+              "latencyMs": {
+                "type": "number"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      ],
+      "fields": [
+        {
+          "key": "bundleHash",
+          "label": "Bundle Hash",
+          "type": "string",
+          "source": "proof",
+          "description": "Content addressed hash of the SSOT bundle"
+        },
+        {
+          "key": "merkleRoot",
+          "label": "Merkle Root",
+          "type": "string",
+          "source": "proof",
+          "description": "Root committed by the SSOT registry"
+        },
+        {
+          "key": "avatar",
+          "label": "Avatar",
+          "type": "string",
+          "source": "flow",
+          "description": "Orchestrator persona emitting the checkpoint"
+        },
+        {
+          "key": "alpha",
+          "label": "Activation Weight",
+          "type": "number",
+          "unit": "ratio",
+          "source": "flow",
+          "description": "Activation weight (alpha_a) for the active avatar"
+        },
+        {
+          "key": "quorum",
+          "label": "Quorum Confidence",
+          "type": "percentage",
+          "source": "flow",
+          "description": "Share of council signatures attached to the checkpoint",
+          "slo": {
+            "warning": 0.8,
+            "critical": 0.6,
+            "comparator": ">="
+          }
+        },
+        {
+          "key": "drift",
+          "label": "Proof-Flow Drift",
+          "type": "number",
+          "unit": "ratio",
+          "source": "derived",
+          "description": "Normalized difference between SSOT root and orchestrator checkpoint timing",
+          "lineage": {
+            "derivesFrom": [
+              "proof.timestamp",
+              "flow.timestamp"
+            ],
+            "transformation": "windowed skew calculation"
+          },
+          "slo": {
+            "warning": 0.05,
+            "critical": 0.1,
+            "comparator": "<="
+          }
+        },
+        {
+          "key": "replayToken",
+          "label": "Replay Token",
+          "type": "string",
+          "source": "execution",
+          "description": "Token used to rehydrate the execution replay"
+        },
+        {
+          "key": "latencyMs",
+          "label": "Execution Latency",
+          "type": "number",
+          "unit": "milliseconds",
+          "source": "execution",
+          "description": "End-to-end latency from proof seal to execution acknowledgement",
+          "slo": {
+            "warning": 2500,
+            "critical": 5000,
+            "comparator": "<="
+          }
+        }
+      ],
+      "dashboards": {
+        "nodeGraph": {
+          "nodes": [
+            {
+              "id": "proof",
+              "label": "SSOT",
+              "layer": "proof",
+              "position": {
+                "x": 0,
+                "y": 0
+              },
+              "bindings": [
+                {
+                  "field": "bundleHash",
+                  "aggregation": "latest"
+                },
+                {
+                  "field": "merkleRoot",
+                  "aggregation": "latest"
+                }
+              ]
+            },
+            {
+              "id": "flow",
+              "label": "Orchestrator",
+              "layer": "flow",
+              "position": {
+                "x": 120,
+                "y": 0
+              },
+              "bindings": [
+                {
+                  "field": "alpha",
+                  "aggregation": "latest",
+                  "window": "5m"
+                },
+                {
+                  "field": "quorum",
+                  "aggregation": "avg",
+                  "window": "5m"
+                }
+              ]
+            },
+            {
+              "id": "execution",
+              "label": "Sol.F1",
+              "layer": "execution",
+              "position": {
+                "x": 240,
+                "y": 0
+              },
+              "bindings": [
+                {
+                  "field": "latencyMs",
+                  "aggregation": "avg",
+                  "window": "10m"
+                },
+                {
+                  "field": "replayToken",
+                  "aggregation": "latest"
+                }
+              ]
+            }
+          ],
+          "edges": [
+            {
+              "from": "proof",
+              "to": "flow",
+              "field": "bundleHash",
+              "label": "Bundle lineage"
+            },
+            {
+              "from": "flow",
+              "to": "execution",
+              "field": "replayToken",
+              "label": "Replay handshake"
+            }
+          ]
+        },
+        "widgets": [
+          {
+            "id": "quorum-health",
+            "type": "timeseries",
+            "title": "Quorum Confidence by Avatar",
+            "query": {
+              "stream": "flow.orchestrator",
+              "window": "15m",
+              "fields": [
+                {
+                  "field": "quorum",
+                  "aggregation": "avg",
+                  "groupBy": [
+                    "avatar"
+                  ]
+                }
+              ],
+              "filters": [
+                {
+                  "field": "bundleHash",
+                  "operator": "contains",
+                  "value": "capsule"
+                }
+              ]
+            }
+          },
+          {
+            "id": "drift-distribution",
+            "type": "distribution",
+            "title": "Drift histogram",
+            "query": {
+              "stream": "flow.orchestrator",
+              "window": "60m",
+              "fields": [
+                {
+                  "field": "drift",
+                  "aggregation": "latest"
+                }
+              ]
+            }
+          },
+          {
+            "id": "execution-latency",
+            "type": "timeseries",
+            "title": "Execution latency",
+            "query": {
+              "stream": "execution.ledger",
+              "window": "30m",
+              "fields": [
+                {
+                  "field": "latencyMs",
+                  "aggregation": "avg"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "alerts": [
+        {
+          "id": "quorum-lag",
+          "description": "Quorum confidence below 0.6 for five minutes",
+          "severity": "warning",
+          "conditions": [
+            {
+              "field": "quorum",
+              "operator": "<",
+              "threshold": 0.6,
+              "duration": "PT5M"
+            }
+          ],
+          "remediation": "Ping council SBT holders and re-run multisig vote"
+        },
+        {
+          "id": "drift-detected",
+          "description": "Drift above 0.1 triggers Dot rollback",
+          "severity": "critical",
+          "conditions": [
+            {
+              "field": "drift",
+              "operator": ">",
+              "threshold": 0.1,
+              "duration": "PT2M"
+            }
+          ],
+          "remediation": "Trigger Dot to roll back to last sealed bundle"
+        },
+        {
+          "id": "replay-mismatch",
+          "description": "Replay token emitted without matching proof",
+          "severity": "critical",
+          "conditions": [
+            {
+              "field": "replayToken",
+              "operator": "!=",
+              "threshold": "proof.matching",
+              "duration": "PT1M"
+            }
+          ],
+          "remediation": "Halt Sol.F1 lane and request SSOT verification"
+        }
+      ]
+    }
+  ]
+}

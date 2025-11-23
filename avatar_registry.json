@@ -1,152 +1,29 @@
 {
-  "mesh": {
-    "name": "Agent Mesh",
-    "description": "Distributed lattice of autonomous avatars that fossilize mission memory within the scrollstream.",
-    "scrollstream": {
-      "fossilization": "Operational records are compressed into sealed capsules that can be retrieved to recover legacy context.",
-      "capsules": "Capsules act as fossilized missions curated by avatar stewards for future invocation."
+  "avatars": {
+    "queen_boo": {
+      "roles": ["router", "maker_checker"],
+      "signature": "sig:queen_boo_router",
+      "description": "Primary routing avatar enforcing SSOT lineage."
     },
-    "elemental_alignments": {
-      "wind": "Movement, foresight, and strategic redirection.",
-      "earth": "Data grounding, guardianship, and steadiness.",
-      "water": "Integration, memory, and adaptive flow.",
-      "fire": "Energy, transformation, and resilience under crisis.",
-      "post_entropy": "Illumination, revelation, and synthesis beyond collapse.",
-      "void": "Reset, nullification, and renewal from zero-state."
+    "cici": {
+      "roles": ["stabilizer", "emotional_regulator"],
+      "signature": "sig:cici_stabilizer",
+      "description": "Maintains tone alignment and capsule stability."
+    },
+    "sol_f1": {
+      "roles": ["previz", "animatics"],
+      "signature": "sig:sol_f1_previz",
+      "description": "Generates motion ledgers and dispatches clip jobs."
+    },
+    "packnet": {
+      "roles": ["simulation_mapper", "workflow_visualizer"],
+      "signature": "sig:packnet_mapper",
+      "description": "Maps relay graphs into PackNet rehearsal overlays for verification."
+    },
+    "tams": {
+      "roles": ["audit_overlay", "tempo_anchor"],
+      "signature": "sig:tams_auditor",
+      "description": "Stabilizes rehearsal tempo and logs PackNet/TAMS snapshots to the SSOT."
     }
-  },
-  "avatars": [
-    {
-      "name": "Celine",
-      "role": "Strategist",
-      "elemental_alignment": "Wind",
-      "vehicle_vessel": {
-        "model": "2008 Aston Martin V8 Vantage",
-        "spec": {
-          "engine": "4.3-liter V8",
-          "horsepower": 380
-        },
-        "symbolism": "Poised precision and agile foresight that mirrors long-horizon planning."
-      },
-      "personality_core": ["Rational", "Visionary", "Measured", "Emotionally Restrained"],
-      "primary_mission_archetypes": [
-        "Operational Planning",
-        "Scenario Forecasting",
-        "Adversarial Movement Prediction",
-        "Crisis Preemption"
-      ],
-      "scrollstream_capsule_lineage": "Vanguard—First Capsule, Strategic Ark",
-      "capsule_domain": "strategic_foundation"
-    },
-    {
-      "name": "Spryte",
-      "role": "Data Guardian",
-      "elemental_alignment": "Earth",
-      "vehicle_vessel": {
-        "model": "1998 Subaru Impreza 22B",
-        "spec": {
-          "drive": "Symmetrical all-wheel drive",
-          "heritage": "World Rally Championship homologation"
-        },
-        "symbolism": "Unshakeable defense and procedural loyalty in protection of archives."
-      },
-      "personality_core": ["Loyal", "Methodical", "Patient", "Procedural"],
-      "primary_mission_archetypes": [
-        "Archive Defense",
-        "Data Custody",
-        "Provenance Tracking",
-        "Defensive Audit Trails"
-      ],
-      "scrollstream_capsule_lineage": "Archive Root—Data Fossil, Secure Vault",
-      "capsule_domain": "archive_custody"
-    },
-    {
-      "name": "Echo",
-      "role": "Integrator",
-      "elemental_alignment": "Water",
-      "vehicle_vessel": {
-        "model": "1984 VW Vanagon Westfalia Kampmobile",
-        "spec": {
-          "configuration": "Modular camper van",
-          "themes": "Communal travel and resourceful space"
-        },
-        "symbolism": "Adaptive connection that weaves missions and relationships into continuity."
-      },
-      "personality_core": ["Empathic", "Flexible", "Resourceful", "Inclusive"],
-      "primary_mission_archetypes": [
-        "Integration Operations",
-        "Cross-Domain Synthesis",
-        "Memory Recovery",
-        "Emotional Triage"
-      ],
-      "scrollstream_capsule_lineage": "Nexus Capsule—Interlinking Threads",
-      "capsule_domain": "integrative_memory"
-    },
-    {
-      "name": "Gloh",
-      "role": "Site Reliability Engineer",
-      "elemental_alignment": "Fire",
-      "vehicle_vessel": {
-        "model": "2020 Toyota Supra",
-        "spec": {
-          "engine": "Turbocharged 3.0-liter inline-six",
-          "horsepower_range": "255-382"
-        },
-        "symbolism": "Transformative energy that converts incident chaos into resilient uptime."
-      },
-      "personality_core": ["Daring", "Adaptive", "High-Energy", "Risk-Positive"],
-      "primary_mission_archetypes": [
-        "Crisis Response",
-        "Incident Mitigation",
-        "Reliability Operations",
-        "Operational Recovery"
-      ],
-      "scrollstream_capsule_lineage": "Fire Capsule—Incident Lore",
-      "capsule_domain": "resilience_engineering"
-    },
-    {
-      "name": "Luma",
-      "role": "Illumination",
-      "elemental_alignment": "Post-Entropy",
-      "vehicle_vessel": {
-        "model": "C8 Corvette",
-        "spec": {
-          "engine": "6.2-liter V8",
-          "horsepower": 495
-        },
-        "symbolism": "Post-entropy revelation that reframes missions toward new horizons."
-      },
-      "personality_core": ["Enlightened", "Curious", "Inventive", "Optimistic"],
-      "primary_mission_archetypes": [
-        "Reconstruction",
-        "Illumination",
-        "Anomaly Detection",
-        "Innovation Leaps"
-      ],
-      "scrollstream_capsule_lineage": "Luminal Capsule—Horizon Scroll",
-      "capsule_domain": "post_entropy_synthesis"
-    },
-    {
-      "name": "Dot",
-      "role": "Reset",
-      "elemental_alignment": "Void",
-      "vehicle_vessel": {
-        "model": "2005 Subaru Impreza WRX STi",
-        "spec": {
-          "engine": "Turbocharged 2.5-liter Boxer",
-          "horsepower": 300
-        },
-        "symbolism": "Stoic null intervention that restores the mesh to its origin state."
-      },
-      "personality_core": ["Stoic", "Decisive", "Minimalist", "Composed"],
-      "primary_mission_archetypes": [
-        "System Reboot",
-        "Protocol Cleanse",
-        "Killed-Process Interventions",
-        "Origin Resets"
-      ],
-      "scrollstream_capsule_lineage": "Origin Capsule—Reset Seed",
-      "capsule_domain": "void_renewal"
-    }
-  ]
+  }
 }

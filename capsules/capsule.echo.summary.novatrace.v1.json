@@ -1,0 +1,109 @@
+{
+  "capsule_id": "capsule.echo.summary.novatrace.v1",
+  "version": "1.0.0",
+  "type": "RemixFossilizationPlan",
+  "author": "Scrollstream Cartography Unit",
+  "purpose": "Seal the NovaTrace remix into a cockpit-readable fossil that preserves pedagogy, emotion, and audit replay hooks.",
+  "lineage": {
+    "sealed_root": "49089f4b5ac5c139ad3de9806cd7d716c858a0e7cb8bb4ce179c4a70548fbea2",
+    "token": "R-2025-001742",
+    "orbit_handshake": {
+      "capsule": "capsule.orbit.remix.mesh.novatrace.v1",
+      "status": "BRAID_READY",
+      "telemetry": "mesh.telemetry.snapshot"
+    },
+    "fossil_bundle": {
+      "canon_visual": "novatrace.remix.canon.visual",
+      "pedagogical_trace": "novatrace.remix.pedagogical.trace",
+      "attestation_bundle": "novatrace.remix.attestation.bundle"
+    }
+  },
+  "visual_fossil": {
+    "layers": [
+      {
+        "name": "avatar_halos",
+        "description": "Ceremonial framing of contributor avatars with audit-stamped halos to show provenance and mood arcs.",
+        "source": "ledger.jsonl",
+        "render_target": "cockpit.panel.avatar.strata"
+      },
+      {
+        "name": "refusal_flare",
+        "description": "Annotated capture of refusal moments, translated into pedagogical callouts for apprentice review.",
+        "source": "contributor.refusal.delta",
+        "render_target": "cockpit.panel.pedagogy.timeline"
+      },
+      {
+        "name": "hud_preview",
+        "description": "Preview tiles for the Remix reward showcasing the lineage-locked creative payload with emotional subtitles.",
+        "source": "remix.reward.payload",
+        "render_target": "cockpit.panel.hud.preview"
+      }
+    ],
+    "emotive_palette": {
+      "baseline": "aurora-sovereign",
+      "flair_overrides": {
+        "queen_boo_router": "indigo-vow",
+        "queen_cici_stabilizer": "rose-echo",
+        "sol_f1_previz": "solar-flare",
+        "dot_auditor": "amber-proof"
+      }
+    }
+  },
+  "export_modes": [
+    {
+      "id": "canon.visual",
+      "format": "image/tiff",
+      "purpose": "Immutable archival rendering for council review and ceremonial permanence.",
+      "delivery": "Scrollstream council vault"
+    },
+    {
+      "id": "pedagogical.trace",
+      "format": "application/json",
+      "purpose": "Structured teaching trace with commentary, refusal annotations, and replay timestamps.",
+      "delivery": "Apprentice teaching archive"
+    },
+    {
+      "id": "attestation.bundle",
+      "format": "application/tar+gzip",
+      "purpose": "Bundle of visual hash proofs, ledger excerpts, and mesh telemetry for auditor replay.",
+      "delivery": "Maker-Checker review desk"
+    }
+  ],
+  "pedagogy": {
+    "curation_order": [
+      "attestation overture",
+      "remix emotional arc",
+      "ledger proof appendix"
+    ],
+    "annotation_protocol": "Each frame or entry must cite ledger coordinates, contributor mood delta, and remix stanza reference.",
+    "apprentice_tasks": [
+      "Trace a refusal flare from ledger event to visual fossil.",
+      "Annotate emotional subtitles with supporting telemetry signals.",
+      "Rebuild the remix reward preview from the attestation bundle hashes."
+    ]
+  },
+  "governance": {
+    "council_review": {
+      "required": true,
+      "quorum": "3-of-5",
+      "signoff_targets": [
+        "queen_boo_router",
+        "queen_cici_stabilizer",
+        "dot_auditor"
+      ]
+    },
+    "maker_checker": {
+      "status": "PENDING",
+      "checklist": [
+        "Verify fossil layers reference sealed ledger entries.",
+        "Confirm export bundles reproduce sealed root hash.",
+        "Document emotional palette overrides in audit log."
+      ]
+    }
+  },
+  "integrity": {
+    "digest_type": "sha256",
+    "fossil_ready": true,
+    "notes": "Fossilization may proceed once mesh telemetry snapshot is countersigned and Remix reward is staged."
+  }
+}

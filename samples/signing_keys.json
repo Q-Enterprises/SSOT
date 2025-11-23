@@ -1,0 +1,28 @@
+{
+  "signers": [
+    {
+      "node_id": "Aurora",
+      "secret_key": "base64:6ag3F5vua/gcnD73jEwWUoW4+c3dtb6OiRFow2J5M1sclYlCcGQEArbqJyqiO+zU3ZGrd4jirz42RfMaqI9WOQ==",
+      "public_key": "base64:HJWJQnBkBAK26icqojvs1N2Rq3eI4q8+NkXzGqiPVjk=",
+      "key_fingerprint": "ed25519:aac0df27618dd179f886ad272500835f0be033cd16cc1d22a423397d438465d9"
+    },
+    {
+      "node_id": "Borealis",
+      "secret_key": "base64:jaQajHDW+JPxr7rYHT+i2ps0Na37zZNg6Bd/DU/snEXsG3jWTJ6Xapq2FgtvNLbZmPnhle2JG+F1t68pKFacsw==",
+      "public_key": "base64:7Bt41kyel2qathYLbzS22Zj54ZXtiRvhdbevKShWnLM=",
+      "key_fingerprint": "ed25519:9fe295592891183c9d5253bfda451ba3af852841c3d13ea763a715b560f9c2cb"
+    },
+    {
+      "node_id": "Celestine",
+      "secret_key": "base64:KBSJuHhNyrmAcjk8LcobF9prEEPSrinaEEpA8Pv37p8hvK2zHezSG3MtscBd0f4DxdQrkbZldeEv5Pxp7ohZog==",
+      "public_key": "base64:Ibytsx3s0htzLbHAXdH+A8XUK5G2ZXXhL+T8ae6IWaI=",
+      "key_fingerprint": "ed25519:9f2778b8a9b4fa75e46ac4ac48607434973fffdcaab40924fc83795dc3c761c9"
+    }
+  ],
+  "attester": {
+    "node_id": "Scrollsmith",
+    "secret_key": "base64:vp+hVzT/OsLTUhRw27L0u7Mhfz41YffWj8tyQCIPHRSL2kctv+tR6Wch/j4HHM5O293FsxL42/Mx8BEbQ8MWig==",
+    "public_key": "base64:i9pHLb/rUelnIf4+BxzOTtvdxbMS+NvzMfARG0PDFoo=",
+    "key_fingerprint": "ed25519:f6ea4359de701ad2d05deed2383b2129661c11f46092fe7f6cef6e50c67adbd1"
+  }
+}
