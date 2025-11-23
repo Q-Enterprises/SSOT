@@ -14,7 +14,7 @@ You’ve already pinned the Proof → Flow → Execution braid. Here’s the fin
 - **Proof (SSOT registry):** Offline, private vault for every artifact—scripts, storyboards, assets, clips, and avatar checkpoints—sealed with SHA-256, Merkle lineage, and council signatures. Maker–checker and quorum rules govern replay and forks. This is your meta-level lead mechanism; Sol.F1 is the runtime bus that carries sealed decisions into operations.
 
 - **Flow (Core orchestrator):** Policy-as-code router. Queen Boo enforces routing/quorum, CiCi stabilizes emotional payload, Dot audits and rollback routes, Luma conducts the cascade and observability. Sol.F1 receives the sealed quorum packet and fans directives across verticals (ADAPTCO, Q.Enterprises, Macchina Soulutions).
-- **Ingress guard:** The FastAPI capsule now blocks traffic from known-hostile ranges (3.134.238.10, 3.129.111.220, 52.15.118.168, 74.220.50.0/24, 74.220.58.0/24) so the relay only accepts council-approved ingress.
+- **Ingress guard (planned):** The FastAPI capsule currently exposes the relay routes without IP filtering or firewall middleware; operators must place it behind their existing edge controls (WAF, security groups, allowlists) until ingress policies are added to the codebase.
 
 - **Execution (Sol.F1 PreViz + clip engines):** Sol.F1 emits motion ledgers and animatics from storyboard capsules, delegates 5–10s clip jobs to Sora (or alternates like Runway/Veo), returns fossils to SSOT. Your film suite is then remixable: Entropic Drifts, ADAPTCO learning with LegoF1, CGI fleet drifting—all lineage-bound in SSOT.
 
