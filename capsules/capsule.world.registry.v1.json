@@ -1,0 +1,31 @@
+{
+  "capsule_id": "capsule.world.registry.v1",
+  "version": "1.0.0",
+  "type": "FederationRegistry",
+  "author": "Earl 'Q' Han",
+  "purpose": "Bind sovereign repositories into a single World Engine node",
+  "linked_repositories": {
+    "adaptco/SSOT": "ledger + immutable truth",
+    "adaptco/core-orchestrator": "runtime cockpit + federation workflows",
+    "adaptco/ADAPTCO-previz": "scene/timeline scaffolding",
+    "adaptco/GOODNOOD": "pedagogy + relay training"
+  },
+  "governance": {
+    "protocol_version": "v6.0",
+    "trust_floor": 90,
+    "quorum_rule": "2-of-3",
+    "attestors": [
+      "Queen Boo",
+      "Queen CiCi",
+      "CouncilNode"
+    ]
+  },
+  "integrity": {
+    "digest_type": "sha256",
+    "scene_root_digest": "sha256:WORLD_ENGINE_<final_hash>",
+    "sealed_at": "2025-09-25T04:06:00-04:00"
+  },
+  "status": "SEALED",
+  "replayable": true,
+  "audit_ready": true
+}

@@ -8,9 +8,13 @@ You’ve already pinned the Proof → Flow → Execution braid. Here’s the fin
 
 ## Core runtime in AxQxOS
 
+> For the capsule-level blueprint that fossilizes CiCi's MoE LoRA inside Agent Boo's vessel (relay architecture, governance gates, rehearsal telemetry, and CI chain), see [`docs/fossilized_relay_architecture.md`](docs/fossilized_relay_architecture.md). The federation registry capsule [`capsules/capsule.world.registry.v1.json`](capsules/capsule.world.registry.v1.json) seals SSOT, Core-Orchestrator, ADAPTCO-previz, and GOODNOOD into one World Engine node under Governance v6.0.
+> For the capsule-level blueprint that fossilizes CiCi's MoE LoRA inside Agent Boo's vessel (relay architecture, governance gates, rehearsal telemetry, and CI chain), see [`docs/fossilized_relay_architecture.md`](docs/fossilized_relay_architecture.md). The federation registry capsule [`capsules/capsule.world.registry.v1.json`](capsules/capsule.world.registry.v1.json) seals SSOT, Core-Orchestrator, ADAPTCO-previz, and GOODNOOD into one World Engine node under Governance v6.0. The KPI baseline capsule [`capsules/capsule.kpi.dashboard.v1.json`](capsules/capsule.kpi.dashboard.v1.json) and its companion dossier [`docs/kpi_dashboard_capsule.md`](docs/kpi_dashboard_capsule.md) anchor audit-grade measurement before additional prompt or relay capsules are inscribed.
+
 - **Proof (SSOT registry):** Offline, private vault for every artifact—scripts, storyboards, assets, clips, and avatar checkpoints—sealed with SHA-256, Merkle lineage, and council signatures. Maker–checker and quorum rules govern replay and forks. This is your meta-level lead mechanism; Sol.F1 is the runtime bus that carries sealed decisions into operations.
 
 - **Flow (Core orchestrator):** Policy-as-code router. Queen Boo enforces routing/quorum, CiCi stabilizes emotional payload, Dot audits and rollback routes, Luma conducts the cascade and observability. Sol.F1 receives the sealed quorum packet and fans directives across verticals (ADAPTCO, Q.Enterprises, Macchina Soulutions).
+- **Ingress guard (planned):** The FastAPI capsule currently exposes the relay routes without IP filtering or firewall middleware; operators must place it behind their existing edge controls (WAF, security groups, allowlists) until ingress policies are added to the codebase.
 
 - **Execution (Sol.F1 PreViz + clip engines):** Sol.F1 emits motion ledgers and animatics from storyboard capsules, delegates 5–10s clip jobs to Sora (or alternates like Runway/Veo), returns fossils to SSOT. Your film suite is then remixable: Entropic Drifts, ADAPTCO learning with LegoF1, CGI fleet drifting—all lineage-bound in SSOT.
 
