@@ -566,37 +566,49 @@
       const screenWidth = distortionCanvas.width / dpr;
       const screenHeight = distortionCanvas.height / dpr;
 
-      dtx.strokeStyle = 'rgba(79, 167, 255, 0.45)';
       dtx.lineWidth = 1;
 
       const screenGridSpacing = 110;
       const worldSpacing = screenGridSpacing / state.camera.zoom;
+      const worldSpacingY = worldSpacing * getFlatten();
       const massSources = [mainBodies.sun, mainBodies.jupiter];
       const influenceScale = state.scaleMode === 'spacetime4d' ? 1.8 : 1.2;
-      const flatten = getFlatten();
 
       const focusX = state.camera.x;
       const focusY = state.camera.y;
       const halfColumns = Math.ceil(screenWidth / screenGridSpacing) + 3;
       const halfRows = Math.ceil(screenHeight / screenGridSpacing) + 3;
+      const maxWarpLength = worldSpacing * 1.5;
+
+      const massPositions = massSources.map(body => ({
+        massRatio: body.mass / mainBodies.sun.mass,
+        position: body.orbitalPeriod === Infinity ? { x: 0, y: 0 } : getBodyPosition(body)
+      }));
 
       for (let gx = -halfColumns; gx <= halfColumns; gx++) {
         for (let gy = -halfRows; gy <= halfRows; gy++) {
           const worldX = focusX + gx * worldSpacing;
-          const worldY = focusY + gy * worldSpacing;
+          const worldY = focusY + gy * worldSpacingY;
 
           let warpX = 0;
           let warpY = 0;
 
-          massSources.forEach(body => {
-            const position = body.orbitalPeriod === Infinity ? { x: 0, y: 0 } : getBodyPosition(body);
+          massPositions.forEach(({ massRatio, position }) => {
             const dx = position.x - worldX;
-            const dy = (position.y * flatten) - worldY;
+            const dy = position.y - worldY;
             const distSq = dx * dx + dy * dy + 1e6;
-            const influence = (body.mass / mainBodies.sun.mass) / distSq;
-            warpX += dx * influence * influenceScale * 1e6;
-            warpY += dy * influence * influenceScale * 1e6;
+            const influence = (massRatio / distSq) * influenceScale * 1e6;
+            warpX += dx * influence;
+            warpY += dy * influence;
           });
+
+          const offsetMagnitude = Math.hypot(warpX, warpY);
+          const clampFactor = Math.min(1, maxWarpLength / (offsetMagnitude || 1));
+          warpX *= clampFactor;
+          warpY *= clampFactor;
+
+          const intensity = Math.min(1, offsetMagnitude / maxWarpLength);
+          dtx.strokeStyle = `rgba(79, 167, 255, ${0.22 + 0.55 * intensity})`;
 
           const screenStart = worldToScreen(worldX, worldY);
           const screenEnd = worldToScreen(worldX + warpX, worldY + warpY);
@@ -694,6 +706,9 @@
       state.warpFieldActive = !state.warpFieldActive;
       warpFieldBtn.classList.toggle('active', state.warpFieldActive);
       distortionCanvas.classList.toggle('active', state.warpFieldActive);
+      if (state.warpFieldActive) {
+        warpRenderAccumulator = 32; // force an immediate render on activation
+      }
     });
 
     pauseBtn.addEventListener('click', () => {
