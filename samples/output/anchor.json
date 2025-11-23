@@ -1,0 +1,10 @@
+{
+  "proof_version": "merkle.anchor.scroll.v1",
+  "clock_source": "scrollstream",
+  "timestamp": "2025-09-24T15:23:35.273Z",
+  "tick": 815,
+  "leaf": "sha256:4c4898f5e354a6ebbe7f7d1eba442fd9f6681662eb53ff053976394ade14eadd",
+  "sibling": "sha256:d26c97a84304a8cd7239ac3a9666a2c29074a57c367c340731c351aedda755d3",
+  "path": [],
+  "root": "sha256:3ff143bcfa7960a4d02afc7c5006c3f081432faa4e6aeb4e69f41df06264c241"
+}

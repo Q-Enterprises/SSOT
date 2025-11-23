@@ -1,0 +1,28 @@
+{
+  "$id": "schema.attest.anchor.royal_flush.v1",
+  "type": "object",
+  "required": [
+    "proof_version",
+    "clock_source",
+    "timestamp",
+    "tick",
+    "leaf",
+    "sibling",
+    "path",
+    "root"
+  ],
+  "properties": {
+    "proof_version": { "const": "merkle.anchor.scroll.v1" },
+    "clock_source": { "enum": ["scrollstream"] },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "tick": { "type": "integer", "minimum": 0 },
+    "leaf": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "sibling": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "path": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+    },
+    "root": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "additionalProperties": false
+}

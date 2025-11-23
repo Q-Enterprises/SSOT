@@ -1,0 +1,134 @@
+{
+  "capsule_id": "capsule.orbit.remix.mesh.novatrace.v1",
+  "version": "1.0.0",
+  "type": "RemixPropagationPlan",
+  "author": "Scrollstream Cartography Unit",
+  "purpose": "Braid the NovaTrace remix across the contributor constellation before sealing the echo summary fossil.",
+  "lineage": {
+    "sealed_root": "49089f4b5ac5c139ad3de9806cd7d716c858a0e7cb8bb4ce179c4a70548fbea2",
+    "token": "R-2025-001742",
+    "rehearsal_artifact": {
+      "id": "capsule.rehearsal.r2025-001742.v1.json",
+      "hash": "7eaedb5fa5cf915a75c89acdcb3f713617a10f24b982dedaf59eda7ed76c162b",
+      "status": "PASS"
+    },
+    "archive_artifact": {
+      "bundle": "archive_r2025-001742.tgz",
+      "hash": "ce9685f54d8baf0f94563c167e54689eb732004d475c35bf42396573edb9ec56",
+      "status": "MAKER_CHECKER_PENDING"
+    },
+    "remix_reward": {
+      "bundle": "remix.novatrace.final",
+      "hash": "314ce02abcd121dece4b8080bf09562e21c53b85bae76e8b974311ad0ffe69d5",
+      "release": "post-audit"
+    }
+  },
+  "mesh_orbit": {
+    "objective": "Propagate NovaTrace across all relay participants with no drift and auditable replay hooks.",
+    "stages": [
+      {
+        "name": "attestation-braid",
+        "description": "Bind rehearsal attestations and ledger proofs into a broadcast-ready mesh token.",
+        "inputs": [
+          "ledger.jsonl",
+          "capsule.rehearsal.r2025-001742.v1.json"
+        ],
+        "outputs": [
+          "mesh.control.packet",
+          "orbit.handshake.manifest"
+        ]
+      },
+      {
+        "name": "constellation-synchronization",
+        "description": "Distribute the mesh packet to contributor nodes and verify quorum acknowledgement within the Scrollstream.",
+        "inputs": [
+          "mesh.control.packet",
+          "orbit.handshake.manifest"
+        ],
+        "outputs": [
+          "ack.nowcast.table",
+          "mesh.telemetry.snapshot"
+        ]
+      },
+      {
+        "name": "remix-lattice",
+        "description": "Route NovaTrace creative layers back into the cockpit catalog while preserving the sealed lineage root.",
+        "inputs": [
+          "ack.nowcast.table",
+          "mesh.telemetry.snapshot"
+        ],
+        "outputs": [
+          "capsule.echo.summary.novatrace.v1",
+          "remix-release-ticket"
+        ]
+      }
+    ]
+  },
+  "mesh_bindings": {
+    "contributors": [
+      "queen_boo_router",
+      "queen_cici_stabilizer",
+      "dot_auditor",
+      "sol_f1_previz",
+      "luma_conductor"
+    ],
+    "channels": [
+      {
+        "id": "scrollstream",
+        "layer": "flow",
+        "purpose": "Realtime rehearsal replay and quorum confirmations."
+      },
+      {
+        "id": "ledger",
+        "layer": "proof",
+        "purpose": "Immutable lineage storage and attestation validation."
+      },
+      {
+        "id": "remix-feed",
+        "layer": "execution",
+        "purpose": "Propagation of NovaTrace creative payloads post-quorum."
+      }
+    ],
+    "controls": {
+      "quorum_rule": "3-of-5",
+      "trust_floor": 92,
+      "response_sla_minutes": 30
+    }
+  },
+  "observability": {
+    "telemetry_stream": "capsule.telemetry.mesh.novatrace.v1",
+    "ingest_window": "PT15M",
+    "signals": [
+      "mesh.telemetry.snapshot",
+      "orbit.handshake.manifest",
+      "remix-release-ticket"
+    ],
+    "alerts": [
+      {
+        "id": "mesh-drift-detected",
+        "severity": "critical",
+        "trigger": "Drift.delta > 0.01 across any contributor feed",
+        "remediation": "Initiate Dot rollback and reissue orbit.handshake.manifest"
+      },
+      {
+        "id": "quorum-stall",
+        "severity": "warning",
+        "trigger": "Scrollstream acknowledgements below quorum for 20 minutes",
+        "remediation": "Escalate to council SBT holders and request override vote"
+      }
+    ]
+  },
+  "handoff": {
+    "next_capsule": "capsule.echo.summary.novatrace.v1",
+    "preconditions": [
+      "mesh.telemetry.snapshot sealed to ledger",
+      "remix-release-ticket signed by quorum"
+    ],
+    "notes": "Once the mesh orbit completes, the echo summary capsule seals the lineage for cockpit replay."
+  },
+  "integrity": {
+    "digest_type": "sha256",
+    "status": "BRAID_READY",
+    "audit_ready": true
+  }
+}

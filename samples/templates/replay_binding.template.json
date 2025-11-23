@@ -1,0 +1,11 @@
+{
+  "binding_version": "replay.guard.royal_flush.v1",
+  "clock_source": "scrollstream",
+  "timestamp": "",
+  "nonce": "",
+  "manifest_hash": "",
+  "attestation_hash": "",
+  "auth_scope": "cockpit.HUD.slot.royal_flush",
+  "replay_window_s": 30,
+  "status": "READY"
+}

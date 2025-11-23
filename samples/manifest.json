@@ -1,0 +1,18 @@
+{
+  "manifest_id": "capsule.invoke.royal_flush.manifest",
+  "capsule": "capsule.invoke.royal_flush.v1",
+  "version": 1,
+  "payload": {
+    "owner": "ceciliaQ",
+    "operations": [
+      {
+        "type": "render",
+        "target": "cockpit.HUD.slot.royal_flush"
+      },
+      {
+        "type": "link",
+        "ref": "manifest://capsule.invoke.royal_flush.v1"
+      }
+    ]
+  }
+}

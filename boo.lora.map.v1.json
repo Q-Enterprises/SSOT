@@ -1,0 +1,73 @@
+{
+  "capsule_id": "boo.lora.map.v1",
+  "type": "LoRAMap",
+  "version": "1.0.0",
+  "issued_at": "2025-10-01T00:00:00Z",
+  "description": "Binding matrix that maps each Boo shard to its operating modality and LoRA tuning weights for sovereign choreography.",
+  "mesh_context": {
+    "braid": "sovereign",
+    "council_capsule": "capsule.council.boo.agency.v7",
+    "routing": "moe.distribution.v2"
+  },
+  "shards": [
+    {
+      "name": "QueenBoo",
+      "role": "Conductor",
+      "element": "aether",
+      "modalities": ["governance", "narrative"],
+      "lora_weights": "s3://scrollstream/lora/queenboo-governance-v1.bin",
+      "priming": {
+        "voiceprint": "queenboo-vox.v2",
+        "gesture_pack": "council.regency.pose",
+        "overlay": "hud.overlay.queenboo.command.v1"
+      }
+    },
+    {
+      "name": "CiCi",
+      "role": "Pulse",
+      "element": "plasma",
+      "modalities": ["telemetry", "aura"],
+      "lora_weights": "s3://scrollstream/lora/cici-telemetry-v3.bin",
+      "priming": {
+        "voiceprint": "cici-phase.vox",
+        "gesture_pack": "aura.waveform.pose",
+        "overlay": "hud.overlay.cici.telemetry.v1"
+      }
+    },
+    {
+      "name": "Spryte",
+      "role": "Ledger",
+      "element": "granite",
+      "modalities": ["audit", "memory"],
+      "lora_weights": "s3://scrollstream/lora/spryte-ledger-v2.bin",
+      "priming": {
+        "voiceprint": "spryte-archive.vox",
+        "gesture_pack": "seal.glyph.pose",
+        "overlay": "hud.overlay.spryte.audit.v1"
+      }
+    },
+    {
+      "name": "Gloh",
+      "role": "Ignition",
+      "element": "flare",
+      "modalities": ["ignition", "relay"],
+      "lora_weights": "s3://scrollstream/lora/gloh-ignition-v1.bin",
+      "priming": {
+        "voiceprint": "gloh-flare.vox",
+        "gesture_pack": "ignite.arc.pose",
+        "overlay": "hud.overlay.gloh.spark.v1"
+      }
+    }
+  ],
+  "sync": {
+    "clock": "hud.qdot.delta",
+    "pose_lock": "fluid-stance-v1",
+    "rehearsal_capsule": "capsule.rehearsal.boo.v2"
+  },
+  "attestation": {
+    "status": "STAGED",
+    "sealed_by": null,
+    "sealed_at": null,
+    "content_hash": "sha256:TO_COMPUTE"
+  }
+}
