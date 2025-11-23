@@ -21,9 +21,7 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: 'npm'
-          cache-dependency-path: |
-            **/package-lock.json
-            **/npm-shrinkwrap.json
+          cache-dependency-path: verify/package.json
 
       - name: Install project dependencies
         run: |
@@ -31,8 +29,10 @@ jobs:
           trap 'echo "::error::Dependency installation failed"' ERR
           if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
             npm ci
-          else
+          elif [ -f package.json ]; then
             npm install
+          else
+            echo "::notice::No package manifest found; skipping npm install"
           fi
         shell: bash
 
