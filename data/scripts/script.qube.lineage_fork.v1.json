@@ -1,0 +1,177 @@
+{
+  "capsule_id": "script.qube.lineage_fork.v1",
+  "title": "Lineage Fork: Sovereign Continuance",
+  "logline": "Queen Boo extends the sovereign cinematic braid into a new lineage, aligning PackNet and TAMS to rehearse the relay before the world engine ignites.",
+  "duration_minutes": 4,
+  "themes": [
+    "lineage as ritual",
+    "simulation as rehearsal",
+    "fail-closed sovereignty"
+  ],
+  "acts": [
+    {
+      "act_id": "act.i.invocation",
+      "title": "Invocation of Continuance",
+      "purpose": "Reaffirm the original cinematic capsule and declare the lineage fork mission.",
+      "scenes": [
+        {
+          "scene_id": "scene.i.1",
+          "title": "Archive Reverie",
+          "runtime_seconds": 70,
+          "summary": "Queen Boo revisits the sovereign archive to harvest Merkle leaves for the forked braid.",
+          "environment": "Qube Sovereign Archive – floating hashes orbit the council table",
+          "beats": [
+            {
+              "beat_id": "beat.i.1.a",
+              "title": "Lineage Declaration",
+              "description": "Queen Boo cites qube.p3l.v1 and authorizes the fork into a new capsule.",
+              "relay_stage": "script",
+              "ssot_refs": [
+                "artifact:script.qube.cinematic.v1",
+                "artifact:design.lattice.lingerie.v1"
+              ],
+              "orchestrator_refs": [
+                "policy:maker_checker"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            },
+            {
+              "beat_id": "beat.i.1.b",
+              "title": "Council Accord",
+              "description": "CiCi stabilizes the emotional register while Sol.F1 preloads the fork ledger.",
+              "relay_stage": "storyboard",
+              "ssot_refs": [
+                "artifact:storyboard.monza.grid.v1"
+              ],
+              "orchestrator_refs": [
+                "stabilizer:cici",
+                "router:queen_boo"
+              ],
+              "previz_refs": [
+                "scene_origin_braid"
+              ],
+              "clip_refs": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "act_id": "act.ii.translation",
+      "title": "Translation into Flow",
+      "purpose": "Bind the fork capsule to assets, motion ledgers, and relay preparation.",
+      "scenes": [
+        {
+          "scene_id": "scene.ii.1",
+          "title": "Relay Drafting",
+          "runtime_seconds": 85,
+          "summary": "Sol.F1 sketches the fork relay while CiCi monitors cadence and PackNet hovers in standby.",
+          "environment": "Monza holographic pit – ghost cars trace routes in amber light",
+          "beats": [
+            {
+              "beat_id": "beat.ii.1.a",
+              "title": "Ledger Fork",
+              "description": "Sol.F1 generates the ghost-ledger based on the original origin braid sequence.",
+              "relay_stage": "motion_ledger",
+              "ssot_refs": [
+                "artifact:script.qube.lineage_fork.v1"
+              ],
+              "orchestrator_refs": [
+                "flow:script>storyboard>asset>motion_ledger>clip>relay"
+              ],
+              "previz_refs": [
+                "scene_variante_chicane",
+                "scene_packnet_rehearsal"
+              ],
+              "clip_refs": []
+            },
+            {
+              "beat_id": "beat.ii.1.b",
+              "title": "Relay Capsule Prep",
+              "description": "Queen Boo binds the fork capsule with ledger references and schedules the simulation overlay.",
+              "relay_stage": "relay",
+              "ssot_refs": [
+                "artifact:clip.monza.launch.v1"
+              ],
+              "orchestrator_refs": [
+                "policy:simulation_ready"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "act_id": "act.iii.rehearsal",
+      "title": "Rehearsal Oath",
+      "purpose": "Stage the PackNet/TAMS overlay and log rehearsal checkpoints.",
+      "scenes": [
+        {
+          "scene_id": "scene.iii.1",
+          "title": "PackNet Wake",
+          "runtime_seconds": 90,
+          "summary": "PackNet unfurls the workflow graph while TAMS paints HUD layers over the ghost motion.",
+          "environment": "PackNet amphitheater – luminous node graph suspended above the track",
+          "beats": [
+            {
+              "beat_id": "beat.iii.1.a",
+              "title": "Overlay Alignment",
+              "description": "PackNet links the fork payload map to TAMS HUD layers for rehearsal.",
+              "relay_stage": "simulation_overlay",
+              "ssot_refs": [
+                "artifact:simulation.packnet.tams.v1"
+              ],
+              "orchestrator_refs": [
+                "avatar:packnet",
+                "avatar:tams"
+              ],
+              "previz_refs": [
+                "scene_packnet_rehearsal"
+              ],
+              "clip_refs": []
+            },
+            {
+              "beat_id": "beat.iii.1.b",
+              "title": "Maker-Checker Echo",
+              "description": "Queen Boo and CiCi sign the rehearsal snapshots and commit them to the SSOT ledger.",
+              "relay_stage": "simulation_overlay",
+              "ssot_refs": [
+                "artifact:simulation.packnet.tams.v1",
+                "artifact:checkpoint.monza.quboo.v1"
+              ],
+              "orchestrator_refs": [
+                "policy:maker_checker"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "relay_alignment": {
+    "ssot_capsule": "ssot.registry.v1",
+    "orchestrator_capsule": "qube.orchestrator.v1",
+    "previz_library": [
+      "scene_origin_braid",
+      "scene_variante_chicane",
+      "scene_pitlane_recovery",
+      "scene_packnet_rehearsal"
+    ],
+    "clip_plan": {
+      "target_clips": 12,
+      "duration_seconds": 240,
+      "cadence_fps": 12,
+      "style_capsules": [
+        "material.abs.v1",
+        "camera.tiltshift.v1",
+        "simulation.overlay.packnet"
+      ]
+    }
+  },
+  "council_directive": "Execute lineage fork first, then hand the relay to PackNet/TAMS for rehearsal snapshots before ignition."
+}

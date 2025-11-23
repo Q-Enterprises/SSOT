@@ -7,6 +7,8 @@ jobs:
   lint-diff-build-test:
     runs-on: ubuntu-latest
     permissions: { contents: read, packages: write }
+    env:
+      OPENAPI_PATH: .well-known/openapi.yaml
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
@@ -15,28 +17,46 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm i -g @stoplight/spectral-cli @openapitools/openapi-diff
-      - run: spectral lint ./.well-known/openapi.yaml
+      - name: Lint OpenAPI description
+        run: spectral lint "${OPENAPI_PATH}"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
-      - name: OpenAPI diff (PR only)
+      - name: Prepare OpenAPI specs
+        id: prep
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          git show ${{ github.event.pull_request.base.sha }}:.well-known/openapi.yaml > old.yaml
-          git show ${{ github.event.pull_request.head.sha }}:.well-known/openapi.yaml > new.yaml
-          openapi-diff old.yaml new.yaml \
+          set -euo pipefail
+          mkdir -p .openapi-diff
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          PATH_IN_REPO="${OPENAPI_PATH}"
+
+          if git cat-file -e "${BASE_SHA}:${PATH_IN_REPO}" 2>/dev/null; then
+            git show "${BASE_SHA}:${PATH_IN_REPO}" > .openapi-diff/base.yaml
+            cp "${PATH_IN_REPO}" .openapi-diff/head.yaml
+            echo "HAS_BASE=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "HAS_BASE=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: OpenAPI diff (PR only)
+        if: ${{ github.event_name == 'pull_request' && steps.prep.outputs.HAS_BASE == 'true' }}
+        run: |
+          openapi-diff .openapi-diff/base.yaml .openapi-diff/head.yaml \
             --fail-on incompatible,major \
-            --report=html:openapi-diff.html \
-            --report=json:openapi-diff.json
+            --report=html:.openapi-diff/openapi-diff.html \
+            --report=json:.openapi-diff/openapi-diff.json
+      - name: Skip OpenAPI diff
+        if: ${{ github.event_name == 'pull_request' && steps.prep.outputs.HAS_BASE != 'true' }}
+        run: echo "No base OpenAPI spec found; treating as a new spec and skipping diff."
       - name: Upload diff report
-        if: ${{ always() && github.event_name == 'pull_request' }}
+        if: ${{ always() && github.event_name == 'pull_request' && steps.prep.outputs.HAS_BASE == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: openapi-diff-report
           path: |
-            openapi-diff.html
-            openapi-diff.json
+            .openapi-diff/openapi-diff.html
+            .openapi-diff/openapi-diff.json
 
       # Build + push image
       - uses: docker/setup-buildx-action@v3

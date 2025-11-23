@@ -1,0 +1,507 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://adaptco.dev/capsules/capsule.adjudicate.monza.v1.json",
+  "title": "capsule.adjudicate.monza.v1",
+  "description": "Adjudication capsule that records how the Monza storyboard and script branches were reconciled under Boo's router authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "capsule",
+    "lineage",
+    "conflicts",
+    "resolution",
+    "signatures",
+    "observability"
+  ],
+  "properties": {
+    "capsule": {
+      "type": "object",
+      "title": "Capsule metadata",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "description",
+        "owners",
+        "tags"
+      ],
+      "properties": {
+        "id": {
+          "const": "capsule.adjudicate.monza"
+        },
+        "version": {
+          "const": "v1"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owners": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "title": "Lineage bundle",
+      "additionalProperties": false,
+      "required": [
+        "adjudicationSet",
+        "artifacts",
+        "ledgerReference"
+      ],
+      "properties": {
+        "adjudicationSet": {
+          "type": "string",
+          "pattern": "^[a-z0-9_.-]+$"
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "version",
+              "role",
+              "branch",
+              "sha256"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "enum": [
+                  "capsule.script.qube.cinematic",
+                  "storyboard.monza.grid",
+                  "assets.monza.abs_livery",
+                  "clip.monza.launch"
+                ]
+              },
+              "version": {
+                "type": "string",
+                "pattern": "^v[0-9]+(\\.[0-9]+)*$"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "script",
+                  "storyboard",
+                  "asset",
+                  "clip"
+                ]
+              },
+              "branch": {
+                "type": "string",
+                "description": "The branch name or capsule lineage path used during adjudication."
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        },
+        "ledgerReference": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "registryPath",
+            "merkleRoot"
+          ],
+          "properties": {
+            "registryPath": {
+              "type": "string",
+              "format": "uri"
+            },
+            "merkleRoot": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "conflicts": {
+      "type": "array",
+      "title": "Conflicts reviewed",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artifact",
+          "dimensions",
+          "invariants",
+          "routerPreference"
+        ],
+        "properties": {
+          "artifact": {
+            "type": "string",
+            "enum": [
+              "capsule.script.qube.cinematic.v1",
+              "storyboard.monza.grid.v1"
+            ]
+          },
+          "dimensions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "description",
+                "evidence"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "invariants": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "routerPreference": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "avatar",
+              "reason",
+              "decision"
+            ],
+            "properties": {
+              "avatar": {
+                "type": "string",
+                "const": "queen_boo_router"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "decision": {
+                "type": "string",
+                "enum": [
+                  "privilege_script",
+                  "privilege_storyboard",
+                  "blend"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "title": "Adjudication outcome",
+      "additionalProperties": false,
+      "required": [
+        "strategy",
+        "braid",
+        "continuityChecks",
+        "handoff"
+      ],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "router_braid",
+            "stabilizer_override",
+            "maker_checker_replay"
+          ]
+        },
+        "braid": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scriptSelection",
+            "storyboardSelection",
+            "synchronization",
+            "notes"
+          ],
+          "properties": {
+            "scriptSelection": {
+              "type": "string",
+              "description": "Reference to the sovereign screenplay capsule elements preserved in the braid."
+            },
+            "storyboardSelection": {
+              "type": "string",
+              "description": "Reference to the storyboard panels honored in the braid."
+            },
+            "synchronization": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "scene",
+                  "scriptCue",
+                  "boardPanel",
+                  "cadence"
+                ],
+                "properties": {
+                  "scene": {
+                    "type": "string"
+                  },
+                  "scriptCue": {
+                    "type": "string"
+                  },
+                  "boardPanel": {
+                    "type": "string"
+                  },
+                  "cadence": {
+                    "type": "string",
+                    "description": "Cadence note ensuring Boo's router rhythm persists across artifacts."
+                  }
+                }
+              }
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        "continuityChecks": {
+          "type": "array",
+          "title": "Checks performed before sealing",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "result",
+              "performedBy"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "result": {
+                "type": "string",
+                "enum": [
+                  "pass",
+                  "fail",
+                  "warn"
+                ]
+              },
+              "performedBy": {
+                "type": "string",
+                "enum": [
+                  "queen_boo_router",
+                  "cici_stabilizer",
+                  "dot_auditor"
+                ]
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "handoff": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "nextCapsule",
+            "instructions"
+          ],
+          "properties": {
+            "nextCapsule": {
+              "type": "string",
+              "enum": [
+                "capsule.adjudicate.monza.v1",
+                "capsule.preview.monza.rehearsal.v1",
+                "qube.telemetry.v1"
+              ]
+            },
+            "instructions": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "signatures": {
+      "type": "object",
+      "title": "Quorum signatures",
+      "additionalProperties": false,
+      "required": [
+        "requiredQuorum",
+        "attestations"
+      ],
+      "properties": {
+        "requiredQuorum": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "threshold",
+            "members"
+          ],
+          "properties": {
+            "threshold": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "members": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "attestations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "avatar",
+              "role",
+              "signature",
+              "timestamp"
+            ],
+            "properties": {
+              "avatar": {
+                "type": "string",
+                "enum": [
+                  "queen_boo_router",
+                  "cici_stabilizer",
+                  "dot_auditor",
+                  "luma_conductor"
+                ]
+              },
+              "role": {
+                "type": "string"
+              },
+              "signature": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{128}$"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+    },
+    "observability": {
+      "type": "object",
+      "title": "Signals emitted to the cockpit",
+      "additionalProperties": false,
+      "required": [
+        "streams",
+        "alerts"
+      ],
+      "properties": {
+        "streams": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "layer",
+              "payload"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "layer": {
+                "type": "string",
+                "enum": [
+                  "proof",
+                  "flow",
+                  "execution"
+                ]
+              },
+              "payload": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "trigger",
+              "severity"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "trigger": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "info",
+                  "warning",
+                  "critical"
+                ]
+              },
+              "routeTo": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "queen_boo_router",
+                    "cici_stabilizer",
+                    "dot_auditor",
+                    "sol_f1_previz"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

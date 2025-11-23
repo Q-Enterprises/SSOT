@@ -1,0 +1,536 @@
+{
+  "capsule_id": "script.monza.origin.v1",
+  "title": "Monza Origin Relay",
+  "logline": "Queen Boo, CiCi, and Sol.F1 shepherd a 10-minute Lego F1 short through the sovereign stack, sealing every motion in the SSOT while keeping drift at bay.",
+  "duration_minutes": 10,
+  "themes": [
+    "ritualized control of creative drift",
+    "capsule-bonded collaboration",
+    "stop-motion velocity"
+  ],
+  "acts": [
+    {
+      "act_id": "act.i.proof",
+      "title": "Proof Wake",
+      "purpose": "Seed the sovereign archive with the foundational Monza script and bind the avatars to the relay mandate.",
+      "scenes": [
+        {
+          "scene_id": "scene.i.1",
+          "title": "Council Vault",
+          "runtime_seconds": 55,
+          "summary": "Queen Boo convenes the council to awaken the dormant Monza capsule.",
+          "environment": "Qube Sovereign Archive – obsidian vault with floating Merkle roots",
+          "beats": [
+            {
+              "beat_id": "beat.i.1.a",
+              "title": "Seal Check",
+              "description": "Queen Boo verifies the integrity of the prior script branch before unlocking the binder.",
+              "relay_stage": "script",
+              "ssot_refs": [
+                "artifact:script.monza.origin.v1",
+                "artifact:script.monza.origin.v0"
+              ],
+              "orchestrator_refs": [
+                "policy:maker_checker"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            },
+            {
+              "beat_id": "beat.i.1.b",
+              "title": "Tone Calibration",
+              "description": "CiCi aligns the emotional register to a resolute frequency before approvals flow.",
+              "relay_stage": "storyboard",
+              "ssot_refs": [
+                "artifact:checkpoint.monza.quboo.v1"
+              ],
+              "orchestrator_refs": [
+                "stabilizer:cici",
+                "payload_register:emotional_tone=\"resolute\""
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            }
+          ]
+        },
+        {
+          "scene_id": "scene.i.2",
+          "title": "Archive Calibration",
+          "runtime_seconds": 60,
+          "summary": "Sol.F1 showcases the story grid while Boo maps proof obligations to each act.",
+          "environment": "Archive halo – holographic story grid suspended above Merkle rings",
+          "beats": [
+            {
+              "beat_id": "beat.i.2.a",
+              "title": "Grid Projection",
+              "description": "Sol.F1 projects the twelve-scene grid and tags SSOT checkpoints per scene.",
+              "relay_stage": "storyboard",
+              "ssot_refs": [
+                "artifact:storyboard.monza.grid.v1"
+              ],
+              "orchestrator_refs": [
+                "router:queen_boo"
+              ],
+              "previz_refs": [
+                "scene_origin_braid"
+              ],
+              "clip_refs": []
+            },
+            {
+              "beat_id": "beat.i.2.b",
+              "title": "Ledger Preview",
+              "description": "CiCi floats sample motion ledgers demonstrating stop-motion cadence holds.",
+              "relay_stage": "motion_ledger",
+              "ssot_refs": [
+                "artifact:script.qube.cinematic.v1"
+              ],
+              "orchestrator_refs": [
+                "policy:no_drift"
+              ],
+              "previz_refs": [
+                "scene_variante_chicane"
+              ],
+              "clip_refs": []
+            }
+          ]
+        },
+        {
+          "scene_id": "scene.i.3",
+          "title": "Merkle Loom",
+          "runtime_seconds": 50,
+          "summary": "The council maps lineage commitments and sets override rules for remix branches.",
+          "environment": "Merkle loom – threads of light weaving capsule hashes",
+          "beats": [
+            {
+              "beat_id": "beat.i.3.a",
+              "title": "Lineage Draft",
+              "description": "Queen Boo drafts lineage ties linking the origin relay to prospective remixes.",
+              "relay_stage": "script",
+              "ssot_refs": [
+                "artifact:script.monza.origin.v1"
+              ],
+              "orchestrator_refs": [
+                "policy:maker_checker"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            },
+            {
+              "beat_id": "beat.i.3.b",
+              "title": "Override Covenant",
+              "description": "CiCi encodes override thresholds ensuring any fork replays proof rituals.",
+              "relay_stage": "relay",
+              "ssot_refs": [
+                "artifact:relay.qube.cinematic.v1"
+              ],
+              "orchestrator_refs": [
+                "policy:no_drift"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            }
+          ]
+        },
+        {
+          "scene_id": "scene.i.4",
+          "title": "Launch Mandate",
+          "runtime_seconds": 65,
+          "summary": "The council authorizes Sol.F1 to begin ledger production under maker-checker watch.",
+          "environment": "Council dais – avatars surrounded by attestation glyphs",
+          "beats": [
+            {
+              "beat_id": "beat.i.4.a",
+              "title": "Attestation Roll",
+              "description": "Queen Boo records signatures for the launch capsule.",
+              "relay_stage": "relay",
+              "ssot_refs": [
+                "artifact:relay.qube.cinematic.v1"
+              ],
+              "orchestrator_refs": [
+                "router:queen_boo"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            },
+            {
+              "beat_id": "beat.i.4.b",
+              "title": "Sol.F1 Briefing",
+              "description": "Sol.F1 accepts the motion ledger brief and promises fossils for SSOT sealing.",
+              "relay_stage": "motion_ledger",
+              "ssot_refs": [
+                "artifact:assets.monza.abs_livery.v1"
+              ],
+              "orchestrator_refs": [
+                "checkpoint:queen_boo.chkpt.2025-09-24T10:34Z"
+              ],
+              "previz_refs": [
+                "scene_pitlane_recovery"
+              ],
+              "clip_refs": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "act_id": "act.ii.flow",
+      "title": "Flow Synthesis",
+      "purpose": "Translate proof obligations into actionable motion and clip directives.",
+      "scenes": [
+        {
+          "scene_id": "scene.ii.1",
+          "title": "Avatar Relay",
+          "runtime_seconds": 55,
+          "summary": "Queen Boo orchestrates capsule routing while CiCi suppresses drift.",
+          "environment": "DimIndex relay lattice – hexagonal nodes pulsing with flow order",
+          "beats": [
+            {
+              "beat_id": "beat.ii.1.a",
+              "title": "Routing Burst",
+              "description": "Queen Boo dispatches script, storyboard, and asset capsules to Sol.F1.",
+              "relay_stage": "flow",
+              "ssot_refs": [
+                "artifact:script.monza.origin.v1",
+                "artifact:storyboard.monza.grid.v1",
+                "artifact:assets.monza.abs_livery.v1"
+              ],
+              "orchestrator_refs": [
+                "flow_sequence:[script_capsule,storyboard_capsule,asset_capsule,motion_ledger,clip_capsule,relay_capsule]"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            },
+            {
+              "beat_id": "beat.ii.1.b",
+              "title": "Tone Dampening",
+              "description": "CiCi smooths emotional drift as the payload register ingests capsule metadata.",
+              "relay_stage": "flow",
+              "ssot_refs": [
+                "artifact:checkpoint.monza.quboo.v1"
+              ],
+              "orchestrator_refs": [
+                "stabilizer:cici"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            }
+          ]
+        },
+        {
+          "scene_id": "scene.ii.2",
+          "title": "Previz Hatch",
+          "runtime_seconds": 60,
+          "summary": "Sol.F1 runs animatic rehearsals against Lego Monza plates.",
+          "environment": "Sol.F1 PreViz bay – luminous sand tables with Lego circuits",
+          "beats": [
+            {
+              "beat_id": "beat.ii.2.a",
+              "title": "Origin Braid Animatic",
+              "description": "Sol.F1 generates the origin braid animatic and exports fossils to the SSOT.",
+              "relay_stage": "motion_ledger",
+              "ssot_refs": [
+                "artifact:script.monza.origin.v1"
+              ],
+              "orchestrator_refs": [
+                "router:queen_boo"
+              ],
+              "previz_refs": [
+                "scene_origin_braid"
+              ],
+              "clip_refs": [
+                "clip_range:001-012"
+              ]
+            },
+            {
+              "beat_id": "beat.ii.2.b",
+              "title": "Variante Adjustment",
+              "description": "CiCi requests staggered holds for Variante cornering, producing a revised ledger.",
+              "relay_stage": "motion_ledger",
+              "ssot_refs": [
+                "artifact:script.qube.cinematic.v1"
+              ],
+              "orchestrator_refs": [
+                "policy:maker_checker"
+              ],
+              "previz_refs": [
+                "scene_variante_chicane"
+              ],
+              "clip_refs": [
+                "clip_range:013-020"
+              ]
+            }
+          ]
+        },
+        {
+          "scene_id": "scene.ii.3",
+          "title": "Asset Chorus",
+          "runtime_seconds": 55,
+          "summary": "Material scientists finalize ABS livery cues while Boo enforces canonical palettes.",
+          "environment": "Material lab – floating swatches of Lego ABS shimmering under tilt-shift lights",
+          "beats": [
+            {
+              "beat_id": "beat.ii.3.a",
+              "title": "Livery Lock",
+              "description": "Queen Boo locks the ABS palette and binds it to the capsule lineage.",
+              "relay_stage": "asset",
+              "ssot_refs": [
+                "artifact:assets.monza.abs_livery.v1"
+              ],
+              "orchestrator_refs": [
+                "policy:no_drift"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            },
+            {
+              "beat_id": "beat.ii.3.b",
+              "title": "Plate Harmonies",
+              "description": "Sol.F1 composites tilt-shift plate variations to feed Sora conditioning.",
+              "relay_stage": "asset",
+              "ssot_refs": [
+                "artifact:assets.monza.abs_livery.v1"
+              ],
+              "orchestrator_refs": [
+                "router:queen_boo"
+              ],
+              "previz_refs": [],
+              "clip_refs": [
+                "clip_range:021-028"
+              ]
+            }
+          ]
+        },
+        {
+          "scene_id": "scene.ii.4",
+          "title": "Ledger Synchrony",
+          "runtime_seconds": 70,
+          "summary": "Avatar council walks through the execution tree, verifying stage readiness.",
+          "environment": "Sovereign planning table – nested rings of stages lighting in sequence",
+          "beats": [
+            {
+              "beat_id": "beat.ii.4.a",
+              "title": "Tree Review",
+              "description": "Queen Boo reviews the execution tree ensuring every stage has a capsule.",
+              "relay_stage": "flow",
+              "ssot_refs": [
+                "artifact:script.monza.origin.v1",
+                "artifact:storyboard.monza.grid.v1"
+              ],
+              "orchestrator_refs": [
+                "flow_sequence:[script_capsule,storyboard_capsule,asset_capsule,motion_ledger,clip_capsule,relay_capsule]"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            },
+            {
+              "beat_id": "beat.ii.4.b",
+              "title": "Checkpoint Sync",
+              "description": "CiCi captures a stabilizer checkpoint before clip rendering begins.",
+              "relay_stage": "checkpoint",
+              "ssot_refs": [
+                "artifact:checkpoint.monza.quboo.v1"
+              ],
+              "orchestrator_refs": [
+                "checkpoint:queen_boo.chkpt.2025-09-24T10:34Z"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "act_id": "act.iii.execution",
+      "title": "Execution Assembly",
+      "purpose": "Render the modular clips, stitch the relay, and seal it into the SSOT.",
+      "scenes": [
+        {
+          "scene_id": "scene.iii.1",
+          "title": "Clip Forge",
+          "runtime_seconds": 55,
+          "summary": "Sora converts motion ledgers into ABS stop-motion clips under CiCi's guard.",
+          "environment": "Sora clip forge – translucent film strips floating through tilt-shift fog",
+          "beats": [
+            {
+              "beat_id": "beat.iii.1.a",
+              "title": "Launch Clip",
+              "description": "The opening launch clip renders and is verified against the ledger.",
+              "relay_stage": "clip",
+              "ssot_refs": [
+                "artifact:clip.monza.launch.v1"
+              ],
+              "orchestrator_refs": [
+                "flow_checkpoint:clip_capsule"
+              ],
+              "previz_refs": [
+                "scene_origin_braid"
+              ],
+              "clip_refs": [
+                "clip:monza.launch.v1"
+              ]
+            },
+            {
+              "beat_id": "beat.iii.1.b",
+              "title": "Variant Run",
+              "description": "Sora iterates Variante chicane clips to confirm cadence holds before sealing.",
+              "relay_stage": "clip",
+              "ssot_refs": [
+                "artifact:clip.monza.launch.v1"
+              ],
+              "orchestrator_refs": [
+                "policy:maker_checker"
+              ],
+              "previz_refs": [
+                "scene_variante_chicane"
+              ],
+              "clip_refs": [
+                "clip_range:029-044"
+              ]
+            }
+          ]
+        },
+        {
+          "scene_id": "scene.iii.2",
+          "title": "Pitlane Recovery",
+          "runtime_seconds": 60,
+          "summary": "A pitlane mishap becomes a test case for checkpoint recovery logic.",
+          "environment": "Pitlane operations deck – holographic pit crew rewinding motion ledgers",
+          "beats": [
+            {
+              "beat_id": "beat.iii.2.a",
+              "title": "Checkpoint Recall",
+              "description": "CiCi replays the checkpoint to rewind to the pre-mishap ledger state.",
+              "relay_stage": "checkpoint",
+              "ssot_refs": [
+                "artifact:checkpoint.monza.quboo.v1"
+              ],
+              "orchestrator_refs": [
+                "checkpoint:queen_boo.chkpt.2025-09-24T10:34Z"
+              ],
+              "previz_refs": [
+                "scene_pitlane_recovery"
+              ],
+              "clip_refs": [
+                "clip_range:045-052"
+              ]
+            },
+            {
+              "beat_id": "beat.iii.2.b",
+              "title": "Ledger Proof",
+              "description": "Sol.F1 compares recovered frames to original fossils to validate deterministic replay.",
+              "relay_stage": "motion_ledger",
+              "ssot_refs": [
+                "artifact:script.monza.origin.v1"
+              ],
+              "orchestrator_refs": [
+                "policy:no_drift"
+              ],
+              "previz_refs": [
+                "scene_pitlane_recovery"
+              ],
+              "clip_refs": []
+            }
+          ]
+        },
+        {
+          "scene_id": "scene.iii.3",
+          "title": "Relay Assembly",
+          "runtime_seconds": 65,
+          "summary": "The council stitches modular clips into the final relay using the execution tree as a map.",
+          "environment": "Relay amphitheater – concentric rings of film strips aligning with Merkle glyphs",
+          "beats": [
+            {
+              "beat_id": "beat.iii.3.a",
+              "title": "Continuity Audit",
+              "description": "CiCi verifies style capsules and motion ledgers align across sequences.",
+              "relay_stage": "relay",
+              "ssot_refs": [
+                "artifact:script.monza.origin.v1",
+                "artifact:clip.monza.launch.v1"
+              ],
+              "orchestrator_refs": [
+                "policy:no_drift"
+              ],
+              "previz_refs": [],
+              "clip_refs": [
+                "clip_range:001-100"
+              ]
+            },
+            {
+              "beat_id": "beat.iii.3.b",
+              "title": "Sound Seal",
+              "description": "Queen Boo approves the sound mix and signs the relay assembly capsule.",
+              "relay_stage": "relay",
+              "ssot_refs": [
+                "artifact:relay.qube.cinematic.v1"
+              ],
+              "orchestrator_refs": [
+                "router:queen_boo"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            }
+          ]
+        },
+        {
+          "scene_id": "scene.iii.4",
+          "title": "Broadcast Handover",
+          "runtime_seconds": 70,
+          "summary": "The finished relay is sealed, logged, and transmitted to the sovereign cinema network.",
+          "environment": "Broadcast nexus – crystalline antennae projecting Merkle signatures",
+          "beats": [
+            {
+              "beat_id": "beat.iii.4.a",
+              "title": "Archive Seal",
+              "description": "The SSOT records canonical hashes and lineage pointers for the broadcast capsule.",
+              "relay_stage": "relay",
+              "ssot_refs": [
+                "artifact:relay.qube.cinematic.v1"
+              ],
+              "orchestrator_refs": [
+                "policy:maker_checker"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            },
+            {
+              "beat_id": "beat.iii.4.b",
+              "title": "Signal Launch",
+              "description": "Queen Boo transmits the finished film with council attestation and drift monitors live.",
+              "relay_stage": "relay",
+              "ssot_refs": [
+                "artifact:relay.qube.cinematic.v1"
+              ],
+              "orchestrator_refs": [
+                "router:queen_boo",
+                "stabilizer:cici"
+              ],
+              "previz_refs": [],
+              "clip_refs": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "relay_alignment": {
+    "ssot_capsule": "ssot.registry.v1",
+    "orchestrator_capsule": "qube.orchestrator.v1",
+    "previz_library": [
+      "scene_origin_braid",
+      "scene_variante_chicane",
+      "scene_pitlane_recovery"
+    ],
+    "clip_plan": {
+      "target_clips": 80,
+      "duration_seconds": 600,
+      "cadence_fps": 12,
+      "style_capsules": [
+        "material.abs.v1",
+        "camera.tiltshift.v1"
+      ]
+    }
+  },
+  "council_directive": "Maker-checker quorum required for any Monza remix. Drift monitors stay active through broadcast handover."
+}

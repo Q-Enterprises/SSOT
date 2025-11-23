@@ -1,0 +1,445 @@
+openapi: 3.1.0
+info:
+  title: Specref Codex & Directionality API
+  description: Sidecar codex for embedding capsules (IP/IP range anchors) and directionality resolution for V6.0 specref jobs.
+  version: 6.0.0
+servers:
+  - url: https://api.specref.example.com/v6
+    description: Production
+security:
+  - BearerAuth: []
+tags:
+  - name: EmbeddingCapsules
+    description: Manage embedding capsules (IP/IP range anchors).
+  - name: Specref
+    description: Resolve directionality and validate jobs.
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    EmbeddingCapsule:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: Unique capsule identifier (e.g., dir_anchor_1).
+        ip:
+          type: string
+          format: ipv4
+          description: IPv4 address when anchoring a single host.
+        ipRange:
+          type: string
+          description: CIDR range when anchoring a subnet.
+          pattern: "^((25[0-5]|2[0-4]\\d|1?\\d?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1?\\d?\\d)/(3[0-2]|[12]?\\d)$"
+        semantics:
+          type: string
+          enum: [forward, backward, neutral, expansion, contraction]
+        scope:
+          type: string
+          enum: [private, public]
+          default: private
+        vectorSlot:
+          type: array
+          minItems: 1
+          items: { type: number }
+        directionSign:
+          type: integer
+          enum: [-1, 0, 1]
+          description: -1=backward, 0=neutral, 1=forward/expansion.
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, semantics, scope, vectorSlot, directionSign]
+
+    EmbeddingCapsuleInput:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        ip:
+          type: string
+          format: ipv4
+        ipRange:
+          type: string
+          pattern: "^((25[0-5]|2[0-4]\\d|1?\\d?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1?\\d?\\d)/(3[0-2]|[12]?\\d)$"
+        semantics:
+          type: string
+          enum: [forward, backward, neutral, expansion, contraction]
+        scope:
+          type: string
+          enum: [private, public]
+          default: private
+        vectorSlot:
+          type: array
+          minItems: 1
+          items: { type: number }
+        directionSign:
+          type: integer
+          enum: [-1, 0, 1]
+      anyOf:
+        - required: [ip]
+        - required: [ipRange]
+      required: [id, semantics, vectorSlot, directionSign]
+
+    SpecrefJob:
+      type: object
+      additionalProperties: false
+      properties:
+        id: { type: string }
+        name: { type: string }
+        capsuleRefs:
+          type: array
+          items: { type: string }
+        resolvedDirectionality:
+          $ref: '#/components/schemas/ResolvedDirectionality'
+        createdAt: { type: string, format: date-time }
+      required: [id, capsuleRefs]
+
+    CreateSpecrefJobInput:
+      type: object
+      additionalProperties: false
+      properties:
+        id: { type: string }
+        name: { type: string }
+        capsuleRefs:
+          type: array
+          minItems: 1
+          items: { type: string }
+        autoResolve:
+          type: boolean
+          description: If true, server computes resolvedDirectionality on create.
+          default: true
+      required: [id, capsuleRefs]
+
+    ResolvedDirectionality:
+      type: object
+      additionalProperties: false
+      properties:
+        combinedSign:
+          type: integer
+          enum: [-1, 0, 1]
+        combinedVector:
+          type: array
+          items: { type: number }
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              capsuleId: { type: string }
+              sign: { type: integer, enum: [-1, 0, 1] }
+              vectorSlot:
+                type: array
+                items: { type: number }
+            required: [capsuleId, sign, vectorSlot]
+      required: [combinedSign, combinedVector]
+
+    ValidationRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        jobId: { type: string }
+        capsuleRefs:
+          type: array
+          items: { type: string }
+        rules:
+          type: array
+          description: Optional validation rule identifiers.
+          items: { type: string }
+      oneOf:
+        - required: [jobId]
+        - required: [capsuleRefs]
+
+    ValidationResult:
+      type: object
+      additionalProperties: false
+      properties:
+        valid: { type: boolean }
+        issues:
+          type: array
+          items:
+            type: object
+            properties:
+              code: { type: string }
+              message: { type: string }
+              severity: { type: string, enum: [info, warning, error] }
+            required: [code, message, severity]
+      required: [valid, issues]
+
+    Error:
+      type: object
+      properties:
+        message: { type: string }
+        code: { type: string }
+      required: [message]
+
+paths:
+  /health:
+    get:
+      tags: [Specref]
+      operationId: health
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                required: [ok]
+
+  /embedding-capsules:
+    get:
+      tags: [EmbeddingCapsules]
+      operationId: listEmbeddingCapsules
+      summary: List embedding capsules
+      parameters:
+        - in: query
+          name: semantics
+          schema: { type: string, enum: [forward, backward, neutral, expansion, contraction] }
+        - in: query
+          name: scope
+          schema: { type: string, enum: [private, public] }
+      responses:
+        '200':
+          description: Capsules
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/EmbeddingCapsule' }
+              examples:
+                seedAnchors:
+                  value:
+                    - id: dir_anchor_1
+                      ip: 3.134.238.10
+                      semantics: forward
+                      scope: private
+                      vectorSlot: [0.134, 0.238, 0.01]
+                      directionSign: 1
+                      createdAt: "2025-01-01T00:00:00Z"
+                    - id: dir_anchor_2
+                      ip: 3.129.111.220
+                      semantics: backward
+                      scope: private
+                      vectorSlot: [0.129, 0.111, 0.22]
+                      directionSign: -1
+                      createdAt: "2025-01-01T00:00:00Z"
+                    - id: dir_anchor_3
+                      ip: 52.15.118.168
+                      semantics: neutral
+                      scope: private
+                      vectorSlot: [0.052, 0.015, 0.118, 0.168]
+                      directionSign: 0
+                      createdAt: "2025-01-01T00:00:00Z"
+                    - id: dir_anchor_4
+                      ipRange: 74.220.50.0/24
+                      semantics: expansion
+                      scope: private
+                      vectorSlot: [0.074, 0.22, 0.05]
+                      directionSign: 1
+                      createdAt: "2025-01-01T00:00:00Z"
+                    - id: dir_anchor_5
+                      ipRange: 74.220.58.0/24
+                      semantics: contraction
+                      scope: private
+                      vectorSlot: [0.074, 0.22, 0.058]
+                      directionSign: -1
+                      createdAt: "2025-01-01T00:00:00Z"
+        '401':
+          description: Unauthorized
+    post:
+      tags: [EmbeddingCapsules]
+      operationId: createEmbeddingCapsule
+      summary: Create an embedding capsule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EmbeddingCapsuleInput' }
+            examples:
+              createForwardHost:
+                value:
+                  id: dir_anchor_6
+                  ip: 10.0.0.5
+                  semantics: forward
+                  scope: private
+                  vectorSlot: [0.01, 0.02, 0.03]
+                  directionSign: 1
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EmbeddingCapsule' }
+        '400':
+          description: Bad request
+
+  /embedding-capsules/{id}:
+    get:
+      tags: [EmbeddingCapsules]
+      operationId: getEmbeddingCapsule
+      summary: Get a capsule by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Capsule
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EmbeddingCapsule' }
+        '404':
+          description: Not found
+    patch:
+      tags: [EmbeddingCapsules]
+      operationId: updateEmbeddingCapsule
+      summary: Update a capsule
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EmbeddingCapsuleInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EmbeddingCapsule' }
+        '404':
+          description: Not found
+    delete:
+      tags: [EmbeddingCapsules]
+      operationId: deleteEmbeddingCapsule
+      summary: Delete a capsule
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+
+  /specref/jobs:
+    post:
+      tags: [Specref]
+      operationId: createSpecrefJob
+      summary: Create a specref job referring to capsules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSpecrefJobInput' }
+            examples:
+              createJob:
+                value:
+                  id: job_001
+                  name: "Lineage Gate A"
+                  capsuleRefs: [dir_anchor_1, dir_anchor_4, dir_anchor_5]
+                  autoResolve: true
+      responses:
+        '201':
+          description: Created job
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SpecrefJob' }
+        '400':
+          description: Bad request
+
+  /specref/jobs/{id}:
+    get:
+      tags: [Specref]
+      operationId: getSpecrefJob
+      summary: Get a specref job
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Job
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SpecrefJob' }
+        '404':
+          description: Not found
+
+  /specref/resolve-directionality:
+    post:
+      tags: [Specref]
+      operationId: resolveDirectionality
+      summary: Resolve combined directionality from capsule refs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                capsuleRefs:
+                  type: array
+                  minItems: 1
+                  items: { type: string }
+              required: [capsuleRefs]
+            examples:
+              sampleResolve:
+                value:
+                  capsuleRefs: [dir_anchor_1, dir_anchor_3, dir_anchor_5]
+      responses:
+        '200':
+          description: Resolved directionality
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResolvedDirectionality' }
+
+  /specref/validate:
+    post:
+      tags: [Specref]
+      operationId: validateSpecref
+      summary: Validate a job or a set of capsule references
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ValidationRequest' }
+            examples:
+              byJobId:
+                value:
+                  jobId: job_001
+                  rules: ["no-duplicate-capsules", "must-include-forward-or-expansion"]
+              byDirectRefs:
+                value:
+                  capsuleRefs: [dir_anchor_1, dir_anchor_2]
+                  rules: ["no-opposite-cancel-out"]
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ValidationResult' }
+        '400':
+          description: Bad request
+        '404':
+          description: Not found

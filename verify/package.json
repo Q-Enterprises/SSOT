@@ -1,0 +1,11 @@
+{
+  "name": "royal-flush-verifier",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Attestation sealing and verification utilities for the royal flush capsule",
+  "scripts": {
+    "verify": "node verify.js",
+    "seal": "node seal_attestation.js"
+  }
+}
