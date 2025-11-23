@@ -20,9 +20,7 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: 'npm'
-          cache-dependency-path: |
-            **/package-lock.json
-            **/npm-shrinkwrap.json
+          cache-dependency-path: verify/package.json
 
       - name: Install avv CLI
         run: |
