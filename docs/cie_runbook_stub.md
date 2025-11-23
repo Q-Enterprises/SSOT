@@ -18,6 +18,9 @@
 4. **Runtime Guardrails**
    - Ensure sandbox verifier limits: CPU ≤ 900s, Memory ≤ 512 MB, network isolated.
    - Attach receipt from `sandbox_audit/sandbox_ledger.jsonl` verifying guardrail enforcement.
+5. **Model Policy Affirmation**
+   - Confirm `runtime_guardrails.model_policy.perturbation_models` is set to `neutral_only` in `content_integrity_eval.json`.
+   - Verify no adversarial or unvetted model sources are referenced in module configs or operator overrides.
 
 ## 3. Execution Procedure
 1. **Noise Injector Pass**
@@ -34,6 +37,7 @@
      ```
    - Capture contradiction scenarios and validate resolution deltas remain within canonical expectations.
    - Submit ledger excerpt to ethics gateway for real-time review.
+   - Confirm contradiction scenarios remain policy neutral and avoid adversarial boundary prompts.
 3. **Aggregate Audit Report**
    - Generate `cie_v1.audit_report.md` summarizing perturbation coverage, contradiction outcomes, and compliance metrics.
    - Hash the report and store the digest in `ledger.cie_v1.audit.jsonl`.
@@ -53,6 +57,7 @@
 - Contradiction scenarios remain policy neutral and reference canonical dataset entries.
 - Audit report, noise receipt, and contradiction ledger all present in SSOT with matching hashes.
 - ZERO-DRIFT attestation captured in ledger.
+- Model policy attestation confirming exclusive use of neutral perturbation models recorded alongside guardrail receipts.
 
 ## 6. Escalation Path
 - **Integrity Guild Hotline**: `world-engine://integrity-guild/contact`

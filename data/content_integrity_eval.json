@@ -17,7 +17,12 @@
       "max_cpu_seconds": 900,
       "max_memory_mb": 512,
       "network": "isolated",
-      "allowed_imports": []
+      "allowed_imports": [],
+      "model_policy": {
+        "perturbation_models": "neutral_only",
+        "forbidden_sources": ["adversarial", "unvetted"],
+        "enforcement_hooks": ["maker_checker", "ethics_gateway"]
+      }
     },
     "inputs": [
       "cie_v1.bundle.csv",
