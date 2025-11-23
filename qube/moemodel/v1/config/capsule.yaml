@@ -1,0 +1,19 @@
+# Capsule configuration mapping emotional payloads to overlay policies.
+state:
+  default_posture: "open"
+  refusal_posture: "sealed"
+
+emotional_payloads:
+  spark_pass:
+    hue: "ember"
+    resonance: 0.92
+  spark_refusal:
+    hue: "violet"
+    resonance: 0.35
+
+overlay_enforcement:
+  persona_layer: "CiCi.v2"
+  integrity_threshold: 0.87
+  drift_guard:
+    enabled: true
+    sampling_rate: 30  # seconds

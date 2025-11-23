@@ -1,0 +1,11 @@
+# Core deep learning frameworks
+torch>=2.1.0
+jax>=0.4.20
+
+# Domain-specific dependencies
+shimmer-core==0.1.0
+capsule-utils==0.3.5
+
+# Tooling
+rich>=13.0.0
+pytest>=7.4.0
