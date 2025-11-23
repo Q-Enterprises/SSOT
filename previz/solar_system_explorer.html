@@ -554,45 +554,56 @@
       ctx.restore();
     }
 
-    function renderWarpField() {
-      const gridSpacing = 80;
+    let warpRenderAccumulator = 0;
+
+    function renderWarpField(deltaMs) {
+      warpRenderAccumulator += deltaMs;
+      if (warpRenderAccumulator < 32) return; // ~30 FPS for the overlay to reduce load
+      warpRenderAccumulator = 0;
+
       clearDistortion();
-      const width = distortionCanvas.width;
-      const height = distortionCanvas.height;
+      const dpr = window.devicePixelRatio || 1;
+      const screenWidth = distortionCanvas.width / dpr;
+      const screenHeight = distortionCanvas.height / dpr;
+
       dtx.strokeStyle = 'rgba(79, 167, 255, 0.45)';
       dtx.lineWidth = 1;
 
-      const dpr = window.devicePixelRatio || 1;
-      const screenWidth = width / dpr;
-      const screenHeight = height / dpr;
-
+      const screenGridSpacing = 110;
+      const worldSpacing = screenGridSpacing / state.camera.zoom;
       const massSources = [mainBodies.sun, mainBodies.jupiter];
+      const influenceScale = state.scaleMode === 'spacetime4d' ? 1.8 : 1.2;
+      const flatten = getFlatten();
 
-      const influenceScale = state.scaleMode === 'spacetime4d' ? 1.65 : 1.0;
+      const focusX = state.camera.x;
+      const focusY = state.camera.y;
+      const halfColumns = Math.ceil(screenWidth / screenGridSpacing) + 3;
+      const halfRows = Math.ceil(screenHeight / screenGridSpacing) + 3;
 
-      for (let x = -gridSpacing * 6; x <= screenWidth + gridSpacing * 6; x += gridSpacing) {
-        for (let y = -gridSpacing * 6; y <= screenHeight + gridSpacing * 6; y += gridSpacing) {
-          let vx = 0;
-          let vy = 0;
+      for (let gx = -halfColumns; gx <= halfColumns; gx++) {
+        for (let gy = -halfRows; gy <= halfRows; gy++) {
+          const worldX = focusX + gx * worldSpacing;
+          const worldY = focusY + gy * worldSpacing;
+
+          let warpX = 0;
+          let warpY = 0;
 
           massSources.forEach(body => {
             const position = body.orbitalPeriod === Infinity ? { x: 0, y: 0 } : getBodyPosition(body);
-            const source = worldToScreen(position.x, position.y);
-
-            const dx = source.x - x;
-            const dy = source.y - y;
-            const distSq = dx * dx + dy * dy + 25;
+            const dx = position.x - worldX;
+            const dy = (position.y * flatten) - worldY;
+            const distSq = dx * dx + dy * dy + 1e6;
             const influence = (body.mass / mainBodies.sun.mass) / distSq;
-            vx += dx * influence * influenceScale * 140;
-            vy += dy * influence * influenceScale * 140;
+            warpX += dx * influence * influenceScale * 1e6;
+            warpY += dy * influence * influenceScale * 1e6;
           });
 
-          const nx = x + vx;
-          const ny = y + vy;
+          const screenStart = worldToScreen(worldX, worldY);
+          const screenEnd = worldToScreen(worldX + warpX, worldY + warpY);
 
           dtx.beginPath();
-          dtx.moveTo(x, y);
-          dtx.lineTo(nx, ny);
+          dtx.moveTo(screenStart.x, screenStart.y);
+          dtx.lineTo(screenEnd.x, screenEnd.y);
           dtx.stroke();
         }
       }
@@ -626,7 +637,7 @@
       drawBodies();
 
       if (state.warpFieldActive) {
-        renderWarpField();
+        renderWarpField(elapsed);
       } else {
         clearDistortion();
       }
