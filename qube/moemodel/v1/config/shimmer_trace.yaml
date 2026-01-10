@@ -1,0 +1,14 @@
+# Shimmer trace thresholds controlling Spark resonance and refusal flare logging.
+resonance_thresholds:
+  spark_min: 0.75
+  spark_max: 0.98
+
+refusal_flare_hooks:
+  enabled: true
+  emit_channels:
+    - "spark://ci-ci/refusal"
+    - "spark://ci-ci/audit"
+
+sync:
+  timestamp_tolerance_ms: 12
+  replay_window_s: 45

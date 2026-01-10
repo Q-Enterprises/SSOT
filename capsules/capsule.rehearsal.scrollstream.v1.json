@@ -1,0 +1,33 @@
+{
+  "capsule_id": "capsule.rehearsal.scrollstream.v1",
+  "type": "RehearsalLoop",
+  "version": "1.0.0",
+  "issued_at": "2025-10-03T00:00:00Z",
+  "cycle": [
+    {
+      "event": "audit.summary",
+      "agent": "Celine/Architect",
+      "output": "System Lock achieved. P3L layers aligned. Sovereign fidelity guaranteed."
+    },
+    {
+      "event": "audit.proof",
+      "agent": "Luma/Sentinel",
+      "output": "Merkle Root verified. LegacyBundle audit confirms immutability and unbroken lineage."
+    },
+    {
+      "event": "audit.execution",
+      "agent": "Dot/Guardian",
+      "output": "Zero-Drift confirmed. Git LFS assets stable. Ready to receive first input hook."
+    }
+  ],
+  "attestation": {
+    "status": "STAGED",
+    "sealed_at": null,
+    "content_hash": null
+  },
+  "governance": {
+    "maker": "Earl Q Han",
+    "checker": "Council",
+    "quorum_required": 2
+  }
+}

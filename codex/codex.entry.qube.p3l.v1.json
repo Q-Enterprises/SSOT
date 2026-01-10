@@ -1,0 +1,94 @@
+{
+  "codex": {
+    "id": "codex.entry.qube.p3l",
+    "version": "v1",
+    "title": "ADAPTCO Qube P3L Sovereign Law",
+    "summary": "Ceremonial constitution defining Proof, Flow, and Execution law for the ADAPTCO Qube World Engine.",
+    "guardians": [
+      "queen_boo_router",
+      "cici_stabilizer",
+      "dot_audit",
+      "luma_observability"
+    ],
+    "sealedAt": "2025-09-24T11:11:00Z"
+  },
+  "law": {
+    "proof": {
+      "fossilization": {
+        "hash": "sha256",
+        "merkle": true,
+        "makerChecker": {
+          "enabled": true,
+          "quorum": "dual_signed"
+        }
+      },
+      "admission": {
+        "gate": "AxQxOS",
+        "proofType": "zk_merkle_path",
+        "registry": "QRH",
+        "handshake": "sovereign"
+      },
+      "replay": {
+        "policy": "quorum_required",
+        "integrity": "must_match_fossil",
+        "ceremony": true
+      }
+    },
+    "flow": {
+      "avatars": [
+        {"name": "queen_boo", "role": "router"},
+        {"name": "cici", "role": "stabilizer"},
+        {"name": "dot", "role": "audit"},
+        {"name": "luma", "role": "observability"}
+      ],
+      "policies": [
+        {"id": "no_drift", "enforcement": "fail_closed"},
+        {"id": "maker_checker", "enforcement": "fail_closed"},
+        {"id": "quorum_check", "enforcement": "fail_closed"}
+      ],
+      "flowOrder": [
+        "scripting",
+        "asset_management",
+        "clip_relay"
+      ],
+      "routing": "braided_under_router_authority"
+    },
+    "execution": {
+      "previz": {
+        "capsule": "sol.f1.previz.v1",
+        "frameRateFps": 12,
+        "emits": ["subjects", "camera_vectors"]
+      },
+      "style": [
+        "material.abs.v1",
+        "camera.tiltshift.v1"
+      ],
+      "clipSpec": {
+        "durationSeconds": {"min": 5, "max": 10},
+        "resolution": "1080p",
+        "codec": "ProRes422"
+      },
+      "assembly": {
+        "relayOrder": "world_engine_stitch",
+        "gradingPreset": "film.look.preset.v1"
+      },
+      "lineage": {
+        "forkHandling": "inherit_then_assign_new_qrh",
+        "drift": "entropic_variations_tracked"
+      }
+    }
+  },
+  "propagation": {
+    "next": [
+      {
+        "capsule": "capsule.rehearse.qube.flow.v1",
+        "purpose": "Stage HUD overlay preview of avatar routing and policies"
+      },
+      {
+        "capsule": "capsule.mission.qube.execution.v1",
+        "purpose": "Choreograph initial cinematic relay under P3L law"
+      }
+    ],
+    "broadcast": "capsule.codex.entry.qube.p3l.v1"
+  }
+}

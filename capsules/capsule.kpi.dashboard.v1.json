@@ -1,0 +1,66 @@
+{
+  "capsule_id": "capsule.kpi.dashboard.v1",
+  "version": "1.0.0",
+  "type": "GovernanceBaseline",
+  "author": "Council Metrics Guild",
+  "purpose": "Establish the KPI dashboard that anchors audit-grade evaluation across the World Engine federation",
+  "governance": {
+    "protocol_version": "v6.0",
+    "trust_floor": 90,
+    "quorum_rule": "2-of-3",
+    "attestors": [
+      "Queen Boo",
+      "Queen CiCi",
+      "CouncilNode"
+    ]
+  },
+  "metric_dimensions": {
+    "technical": {
+      "objectives": [
+        "CI pipeline reliability >= 99.0%",
+        "Drift.delta during rehearsal <= 0.01",
+        "Replay token issuance latency <= 5m"
+      ],
+      "signals": [
+        "CI status webhooks",
+        "HUD telemetry streams",
+        "Replay service audit log"
+      ]
+    },
+    "operational": {
+      "objectives": [
+        "Quorum turn-around <= 24h",
+        "Override response time <= 30m",
+        "Incident MTTR <= 2h"
+      ],
+      "signals": [
+        "Override simulator events",
+        "Quorum signature ledger",
+        "Pager duty transcripts"
+      ]
+    },
+    "business": {
+      "objectives": [
+        "Trailer milestone adherence >= 95%",
+        "Audience sentiment delta >= +0.2",
+        "Asset reuse ratio >= 0.6"
+      ],
+      "signals": [
+        "Release milestone register",
+        "Sentiment analysis capsule",
+        "Asset registry utilization logs"
+      ]
+    }
+  },
+  "observability": {
+    "telemetry_schema": "capsule.telemetry.metric.v1",
+    "ingest_rate": "15m",
+    "storage_class": "SSOT-ledger"
+  },
+  "integrity": {
+    "digest_type": "sha256",
+    "sealed_at": "2025-09-25T06:45:00-04:00",
+    "status": "SEALED",
+    "audit_ready": true
+  }
+}

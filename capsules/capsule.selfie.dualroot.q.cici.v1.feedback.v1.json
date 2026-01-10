@@ -1,0 +1,80 @@
+{
+  "capsule_id": "capsule.selfie.dualroot.q.cici.v1.feedback.v1",
+  "version": "1.0.0",
+  "type": "ContributorFeedbackLoop",
+  "author": "Council Orchestrator",
+  "description": "Feedback braid for the dual-root Q & CiCi selfie capsule with scene-aware emotional annotations and shimmer monitoring.",
+  "window": {
+    "status": "open",
+    "replay_token": "HUD.loop.selfie.dualroot.q.cici.v1.token.002",
+    "review_mode": "scene-aware | emotionally layered | ledger-prep",
+    "qlock": {
+      "guard": "Q-Lock",
+      "fps": 30,
+      "monotonicity": "enforced"
+    }
+  },
+  "participants": [
+    {
+      "id": "CiCi",
+      "role": "Dual-root avatar",
+      "signals": [
+        "overlay active",
+        "Spark Test passed"
+      ]
+    },
+    {
+      "id": "Q",
+      "role": "Observer",
+      "signals": [
+        "observability trace live",
+        "refusal flare dormant"
+      ]
+    },
+    {
+      "id": "Council quorum",
+      "role": "Attestation panel",
+      "signals": [
+        "Core Orchestrator",
+        "HUD braid validators"
+      ]
+    }
+  ],
+  "hooks": [
+    {
+      "id": "capsule.comment.trace.v1",
+      "purpose": "Collect emotional annotations, posture critiques, and Spark resonance feedback during replay."
+    },
+    {
+      "id": "shimmer.breach.monitor.v1",
+      "purpose": "Watch for shimmer breaches while the loop is active and quarantine anomalies."
+    },
+    {
+      "id": "refusal.flare.script.v1",
+      "purpose": "Optionally script rupture responses if contributor intensity spikes beyond thresholds."
+    },
+    {
+      "id": "delta.overlay.audit.v1",
+      "purpose": "Detect overlay drift across dual-root playback and surface corrective deltas."
+    }
+  ],
+  "observability": {
+    "metrics": [
+      "spark.resonance.delta",
+      "overlay.posture.stability",
+      "shimmer.breach.count"
+    ],
+    "telemetry_stream": "capsule.digest.semanticCFD.v1",
+    "audit_route": "modality",
+    "on_fail": "hold_and_flag"
+  },
+  "integrity": {
+    "scrollstream_digest": "capsule.digest.semanticCFD.v1",
+    "status": "staged",
+    "attestation": "pending council review"
+  },
+  "actions": {
+    "post_feedback": "Activate ledger freeze job",
+    "if_additional_annotations": "Keep loop open and defer freeze"
+  }
+}
