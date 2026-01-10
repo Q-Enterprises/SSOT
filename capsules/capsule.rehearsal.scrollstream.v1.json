@@ -1,128 +1,33 @@
 {
   "capsule_id": "capsule.rehearsal.scrollstream.v1",
+  "type": "RehearsalLoop",
   "version": "1.0.0",
-  "type": "ScrollstreamRehearsal",
-  "author": "Scrollstream Relay Guild",
-  "sealed": false,
-  "purpose": "Stage the Celine → Luma → Dot audit rehearsal loop and capture deterministic ledger emissions for contributor training.",
-  "cycle": {
-    "order": [
-      {
-        "stage": "audit.summary",
-        "agent": "celine_architect",
-        "persona": "Celine/Architect",
-        "intent": "Synthesize capsule braid context and set HUD shimmer baseline.",
-        "expected_output": "Architectural braid synopsis with glyph.pulse modulation",
-        "handoff": "Emit scrollstream ledger entry 1 and notify Luma via shimmer channel"
-      },
-      {
-        "stage": "audit.proof",
-        "agent": "luma_sentinel",
-        "persona": "Luma/Sentinel",
-        "intent": "Validate proof bundle, confirm quorum signatures, and score Sabrina Spark Test.",
-        "expected_output": "Proof digest with aura.gold resonance",
-        "handoff": "Append ledger entry 2, pulse replay glyph, route baton to Dot"
-      },
-      {
-        "stage": "audit.execution",
-        "agent": "dot_guardian",
-        "persona": "Dot/Guardian",
-        "intent": "Replay execution checkpoints, lock qlock.tick alignment, and seal shimmer.",
-        "expected_output": "Execution checkpoint replay with qlock.tick alignment",
-        "handoff": "Append ledger entry 3, mark braid replay-ready"
-      }
-    ],
-    "handoff_invariants": [
-      "Stage order is immutable (summary → proof → execution)",
-      "Each stage emits at most one ledger entry per rehearsal",
-      "HUD shimmer intensity escalates monotonically per stage"
-    ]
-  },
-  "ledger": {
-    "stream": "scrollstream_ledger",
-    "storage": "append-only",
-    "timestamp_format": "RFC3339/ISO-8601 with millisecond precision",
-    "entry_schema": {
-      "sequence": "integer",
-      "timestamp": "string",
-      "stage": "enum[audit.summary,audit.proof,audit.execution]",
-      "agent": "string",
-      "persona": "string",
-      "capsule_id": "string",
-      "hud_shimmer": {
-        "channel": "enum[glyph.pulse,aura.gold,qlock.tick]",
-        "intensity": "float",
-        "duration_ms": "integer"
-      },
-      "output": {
-        "focus": "string",
-        "emotional_payload": "enum[anticipation,resolve,assurance]",
-        "sparkline": "hex16",
-        "body_digest": "sha256"
-      }
+  "issued_at": "2025-10-03T00:00:00Z",
+  "cycle": [
+    {
+      "event": "audit.summary",
+      "agent": "Celine/Architect",
+      "output": "System Lock achieved. P3L layers aligned. Sovereign fidelity guaranteed."
     },
-    "deterministic_profile": {
-      "training_seed": "capsule.rehearsal.scrollstream.v1::training-seed::v1",
-      "ci_mode": true,
-      "example_payload": "samples/output/scrollstream_rehearsal_loop.json"
+    {
+      "event": "audit.proof",
+      "agent": "Luma/Sentinel",
+      "output": "Merkle Root verified. LegacyBundle audit confirms immutability and unbroken lineage."
     },
-    "braid_reference": "scrollstream.demo.001"
-  },
-  "visual_feedback": {
-    "hud_shimmer": {
-      "trigger": "on_stage_complete",
-      "duration_ms": 1800,
-      "color": "#9AD6FF",
-      "intensity_curve": "ease-in-out",
-      "confirmation": "Contributor HUD shimmer confirms capsule emission"
-    },
-    "replay_glyph": {
-      "icon": "braid.pulse",
-      "pulse_rate_hz": 1.5,
-      "rail": "scrollstream",
-      "tooltip": "Replay Celine → Luma → Dot",
-      "spark_test": {
-        "name": "Sabrina Spark Test",
-        "status": "required",
-        "applied_per_stage": true
-      }
-    },
-    "contributor_view": {
-      "one_click_replay": true,
-      "display_fields": ["timestamp", "stage", "agent", "emotional_payload"],
-      "feedback": "Full lifecycle appears in scrollstream rail with replay glyph pulsing"
+    {
+      "event": "audit.execution",
+      "agent": "Dot/Guardian",
+      "output": "Zero-Drift confirmed. Git LFS assets stable. Ready to receive first input hook."
     }
+  ],
+  "attestation": {
+    "status": "STAGED",
+    "sealed_at": null,
+    "content_hash": null
   },
-  "training_mode": {
-    "deterministic": true,
-    "emotional_payloads": {
-      "audit.summary": "anticipation",
-      "audit.proof": "resolve",
-      "audit.execution": "assurance"
-    },
-    "evaluation": {
-      "scoring_model": "rehearsal-braid-v1",
-      "inputs": ["sparkline", "hud_shimmer.intensity", "emotional_payload"],
-      "pass_condition": "All stages pass Sabrina Spark Test"
-    },
-    "ci_profile": {
-      "script": "scripts/emit_scrollstream_rehearsal.py",
-      "artifact": "samples/output/scrollstream_rehearsal_loop.json",
-      "purpose": "CI/CD smoke test of scrollstream rehearsal emission"
-    }
-  },
-  "observability": {
-    "hud_channels": ["glyph.pulse", "aura.gold", "qlock.tick"],
-    "alerting": {
-      "on_missing_stage": "Raise Dot rollback alert",
-      "on_timestamp_gap": "Trigger Luma drift warning"
-    },
-    "metrics": {
-      "replay_latency_s": 2.0,
-      "ledger_consistency": "sha256",
-      "shimmer_ack_rate": "100%"
-    }
-  },
-  "status": "STAGED",
-  "audit_ready": true
+  "governance": {
+    "maker": "Earl Q Han",
+    "checker": "Council",
+    "quorum_required": 2
+  }
 }

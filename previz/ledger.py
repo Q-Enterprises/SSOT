@@ -52,6 +52,11 @@ class MotionLedger(BaseModel):
             return 0.0
         first_frame = self.frames[0].frame
         last_frame = self.frames[-1].frame
+        if last_frame < first_frame:
+            return 0.0
+        return last_frame / max(self.fps, 1)
+        first_frame = self.frames[0].frame
+        last_frame = self.frames[-1].frame
         return (last_frame - first_frame) / max(self.fps, 1)
 
     def track_for(self, car_id: str) -> List[SubjectPose]:

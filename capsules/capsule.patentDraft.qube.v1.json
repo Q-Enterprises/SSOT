@@ -1,130 +1,56 @@
 {
   "capsule_id": "capsule.patentDraft.qube.v1",
-  "version": "1.0.0",
   "qube": {
-    "p3l_ref": "urn:p3l:phase1:qlock:lid:qbits:2024-09-21",
-    "q_lock": {
-      "layer": "LiD",
-      "nonce_strategy": "deploymentId-bound",
-      "replay_window_seconds": 120
-    },
+    "p3l_ref": "urn:p3l:phase1:qLock:LiD:QBits",
     "sr_gate": "v1",
     "moe_topology": {
-      "experts": 8,
+      "experts": "N",
       "router": "SR",
-      "router_version": "sr-gate-router-1.2.0",
-      "route_signature": "sha256:5f7b9b0d7b4c2f11c2ce0d2fb6d8884ed79f2a21e6f4b1c9e74ef30b2cf835db"
+      "ab_determinism_seed": "phase1-seed"
     },
     "malintent": "BLQB9X/MIT.01",
     "artifact": {
       "type": "R0P3",
       "format": "iRQLxTR33",
-      "ab_seed": "seed:phase1:qube:deterministic",
-      "expected_size_bytes": 131072
+      "packaging_map": [
+        "P3L",
+        "qLock/LiD",
+        "QBits",
+        "SR Gate",
+        "MoE",
+        "BLQB9X",
+        "R0P3"
+      ]
     }
   },
   "lineage": {
-    "qonledge_ref": "urn:qon:phase1:braid:qube",
+    "qonledge_ref": "urn:qon:phase1:pending",
     "scrollstream": true,
-    "audit_braid": ["Celine", "Luma", "Dot"],
-    "ledger_append_target": "ledger/federation.jsonl"
+    "dual_run": {
+      "mode": "A/B",
+      "seed": "phase1-seed",
+      "delta_emit": true
+    }
   },
   "integrity": {
-    "sha256_p3l": "sha256:cc6d1c7eb14b01c4edaf7ca3bc32f6f979d7ef1ad1ec104a3032b9b9b568cc3f",
-    "merkle_root": "8a42e2158450dbf1b07fb87a9a8a7cf13d3c2f34621c95a6ee8f2b23fa449c9b",
-    "attestation_quorum": "2-of-3",
-    "dual_run_hash": {
-      "instance_a": "sha256:4f72db6ef3d4c78d658d6c7f03c3c44f5c9b72ac745adb8fbf6d049c1c6d8ea1",
-      "instance_b": "sha256:4f72db6ef3d4c78d658d6c7f03c3c44f5c9b72ac745adb8fbf6d049c1c6d8ea1",
-      "delta": "sha256:0"
-    }
+    "sha256_p3l": "sha256:TODO",
+    "merkle_root": "TODO",
+    "attestation_quorum": "2-of-3"
   },
-  "packaging_map": {
-    "inputs": [
-      "P3L",
-      "qLock/LiD",
-      "QBits",
-      "SR Gate",
-      "MoE",
-      "BLQB9X",
-      "R0P3"
-    ],
+  "governance": {
     "gates": [
-      {
-        "gate": "G01",
-        "name": "ticket hash",
-        "status": "pending",
-        "controls": [
-          "bind deploymentId",
-          "nonce-sealed"
-        ]
-      },
-      {
-        "gate": "G02",
-        "name": "fitment",
-        "status": "pending",
-        "controls": [
-          "router topology audit",
-          "qLock alignment"
-        ]
-      },
-      {
-        "gate": "G03",
-        "name": "artifact hashes",
-        "status": "pending",
-        "controls": [
-          "R0P3 sha256",
-          "per-expert logits"
-        ]
-      },
-      {
-        "gate": "G04",
-        "name": "expected verify",
-        "status": "pending",
-        "controls": [
-          "A/B determinism",
-          "merkle attestation"
-        ]
-      }
-    ],
-    "seal_condition": "All gates cleared and SEAL event emitted"
-  },
-  "orchestrator_alignment": {
-    "run_order": [
-      "make freeze",
-      "make listener",
-      "make post",
-      "make verify",
-      "make qube-stage",
-      "make seal",
-      "make qube-export",
-      "make echo-flare"
-    ],
-    "api": {
-      "post_runs": "Attach QUBE metadata into receipts.qube and declare acsa.trace.jsonl + acsa.metrics.json.",
-      "post_artifacts": "Record R0P3 hash, gate G03, and gate G04 verification payloads.",
-      "post_seal": "Emit finalsealHash bound to DAO proof_binding.",
-      "post_dao_export": "protocol=capsule.export.qubePatent.v1 after SEAL"
-    }
-  },
-  "council_checklist": {
-    "proof_binding": "sha256(request.json)",
-    "merkle_proof": true,
-    "attestation_quorum_met": true,
-    "dual_instance_match": true,
-    "blqb9x_pass": true,
-    "qonledge_append_confirmed": true
-  },
-  "threat_surface": {
-    "sr_gate": "Pin router version and sign routing tables to prevent route poisoning.",
-    "moe_drift": "Log per-expert logits, temperature, and deterministic seed for audit replay.",
-    "lid_replay": "Nonce with deploymentId binding and enforce replay window.",
-    "ledger_fork": "Notarize append with council signature set."
+      "G01-ticket-hash",
+      "G02-fitment",
+      "G03-artifact-hashes",
+      "G04-expected-verify",
+      "SEAL"
+    ]
   },
   "meta": {
     "epoch": "phase.1.x",
     "issuer": "Council",
     "policy": "P3L.vX",
-    "issued_at": "2024-09-21T00:00:00Z"
+    "issued_at": "ISO-UTC",
+    "notes": "Generated for council staging; fill hashes before seal."
   }
 }

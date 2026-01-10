@@ -17,7 +17,7 @@
     }
   },
   "meta": {
-    "issued_at": "2024-09-21T00:00:00Z",
+    "issued_at": "ISO-UTC",
     "issuer": "Council",
     "epoch": "phase.1.x",
     "trigger_event": "SEAL",
