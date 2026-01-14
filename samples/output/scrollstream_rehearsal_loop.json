@@ -1,0 +1,78 @@
+{
+  "capsule_id": "capsule.rehearsal.scrollstream.v1",
+  "braid_id": "scrollstream.demo.001",
+  "training_seed": "capsule.rehearsal.scrollstream.v1::training-seed::v1",
+  "cycle": [
+    "audit.summary",
+    "audit.proof",
+    "audit.execution"
+  ],
+  "ledger": [
+    {
+      "sequence": 1,
+      "timestamp": "2025-09-27T12:00:00.000Z",
+      "stage": "audit.summary",
+      "agent": "celine_architect",
+      "persona": "Celine/Architect",
+      "capsule_id": "capsule.rehearsal.scrollstream.v1",
+      "hud_shimmer": {
+        "channel": "glyph.pulse",
+        "intensity": 0.8,
+        "duration_ms": 1800
+      },
+      "output": {
+        "focus": "Architectural braid synopsis",
+        "emotional_payload": "anticipation",
+        "sparkline": "e815ac8e32d99fd6",
+        "body_digest": "sha256:e815ac8e32d99fd6d85675b4949f72e7952f7a98d7a2697e0b020e65b2a8e61d"
+      }
+    },
+    {
+      "sequence": 2,
+      "timestamp": "2025-09-27T12:00:42.000Z",
+      "stage": "audit.proof",
+      "agent": "luma_sentinel",
+      "persona": "Luma/Sentinel",
+      "capsule_id": "capsule.rehearsal.scrollstream.v1",
+      "hud_shimmer": {
+        "channel": "aura.gold",
+        "intensity": 0.88,
+        "duration_ms": 1800
+      },
+      "output": {
+        "focus": "Proof bundle verification",
+        "emotional_payload": "resolve",
+        "sparkline": "609678df1ffb8598",
+        "body_digest": "sha256:609678df1ffb85982f96a42bc34d9300074af01aedd0ad6d32624f1bf9998aa6"
+      }
+    },
+    {
+      "sequence": 3,
+      "timestamp": "2025-09-27T12:01:24.000Z",
+      "stage": "audit.execution",
+      "agent": "dot_guardian",
+      "persona": "Dot/Guardian",
+      "capsule_id": "capsule.rehearsal.scrollstream.v1",
+      "hud_shimmer": {
+        "channel": "qlock.tick",
+        "intensity": 0.96,
+        "duration_ms": 1800
+      },
+      "output": {
+        "focus": "Execution checkpoint replay",
+        "emotional_payload": "assurance",
+        "sparkline": "ac9842d092f38d0b",
+        "body_digest": "sha256:ac9842d092f38d0b31777fa8465763392bb96e3e0abb4d2d63a3b86baa925960"
+      }
+    }
+  ],
+  "replay_glyph": {
+    "icon": "braid.pulse",
+    "pulse_rate_hz": 1.5,
+    "spark_test": {
+      "name": "Sabrina Spark Test",
+      "status": "pass",
+      "applied_at": "2025-09-27T12:02:06.000Z"
+    }
+  }
+}
