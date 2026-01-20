@@ -43,7 +43,7 @@
         },
         "invariants": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string", "minLength": 1 },
           "minItems": 1,
           "description": "Conditions that must hold for any state to be considered valid."
         }
