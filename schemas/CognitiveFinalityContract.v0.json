@@ -22,10 +22,12 @@
     },
     "arc_id": {
       "type": "string",
+      "minLength": 1,
       "description": "Worldline identifier this contract binds to (ArcState)."
     },
     "agent_id": {
       "type": "string",
+      "minLength": 1,
       "description": "Logical agent identifier (e.g., CoffeeAgent_Prime)."
     },
     "state_model": {
@@ -36,6 +38,7 @@
       "properties": {
         "state_space": {
           "type": "string",
+          "minLength": 1,
           "description": "Reference to the state representation (e.g., phase-space, tensor, graph)."
         },
         "invariants": {
@@ -59,7 +62,7 @@
         },
         "required_evidence": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string", "minLength": 1 },
           "minItems": 1,
           "description": "Evidence that must exist for a decision to be replay-admissible."
         }
@@ -73,11 +76,12 @@
       "properties": {
         "event_schema": {
           "type": "string",
+          "minLength": 1,
           "description": "Reference to the event schema used for cognitive logs (e.g., AgentEvent.v1)."
         },
         "minimum_fields": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string", "minLength": 1 },
           "minItems": 1,
           "description": "Fields that must be present in every logged decision event."
         }
@@ -91,13 +95,13 @@
       "properties": {
         "allowed_states": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string", "minLength": 1 },
           "minItems": 1,
           "description": "State labels from which finality may be declared."
         },
         "required_checks": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string", "minLength": 1 },
           "minItems": 1,
           "description": "Checks that must pass before finality is valid (e.g., invariants_satisfied, drift_absent)."
         }
@@ -116,11 +120,12 @@
         "thresholds": {
           "type": "object",
           "additionalProperties": { "type": "number" },
+          "minProperties": 1,
           "description": "Named thresholds for drift metrics (e.g., max_divergence, max_entropy_delta)."
         },
         "actions": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string", "minLength": 1 },
           "minItems": 1,
           "description": "Actions to take when drift is detected (e.g., abort, quarantine, require_human_review)."
         }
@@ -136,10 +141,12 @@
           "format": "date-time"
         },
         "created_by": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "manifold_version": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         }
       }
     }
