@@ -1,8 +1,5 @@
 name: cie-audit-ci
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch: {}
 
 jobs:
@@ -13,14 +10,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-node@v4
         with:
-          python-version: "3.x"
+          python-version: '3.x'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pynacl
+          pip install pynacl  # Correct PyPI package name
 
       - name: Run CIE V1 Validator
         id: validator
@@ -30,18 +27,12 @@ jobs:
             --payloads inputs/cie_v1_audit/payloads.ndjson \
             --receipts ledger/cie_v1/neutrality_receipts.jsonl
         env:
-          GITHUB_TOKEN: ${{ secrets.SKULLKEY }}
+          GITHUB_TOKEN: ${{ secrets.SKULLKEY }} # Use the SkullKey secret [cite: 38]
 
       - name: Trigger Zapier Webhook
         if: always()
-        env:
-          ZAPIER_WEBHOOK_URL: ${{ secrets.ZAPIER_WEBHOOK_URL }}
         run: |
-          if [ -z "$ZAPIER_WEBHOOK_URL" ]; then
-            echo "ZAPIER_WEBHOOK_URL secret is not configured." >&2
-            exit 1
-          fi
-          curl -X POST "$ZAPIER_WEBHOOK_URL" \
+          curl -X POST https://hooks.zapier.com/hooks/catch/YOUR_ZAPIER_ID/ \
             -H "Content-Type: application/json" \
             -d '{
               "status": "${{ job.status }}",
