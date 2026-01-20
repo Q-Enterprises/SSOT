@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theqube.local/schemas/CognitiveFinalityContract.v0.json",
+  "title": "CognitiveFinalityContract.v0",
+  "type": "object",
+  "description": "Defines replay-court-admissible cognition: what a cognitive state is, what a decision is, and when finality may be declared.",
+  "required": [
+    "version",
+    "arc_id",
+    "agent_id",
+    "state_model",
+    "decision_model",
+    "logging_requirements",
+    "finality_conditions",
+    "drift_detection",
+    "provenance"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "CognitiveFinalityContract.v0"
+    },
+    "arc_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Worldline identifier this contract binds to (ArcState)."
+    },
+    "agent_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Logical agent identifier (e.g., CoffeeAgent_Prime)."
+    },
+    "state_model": {
+      "type": "object",
+      "description": "Definition of a valid cognitive state.",
+      "required": ["state_space", "invariants"],
+      "additionalProperties": false,
+      "properties": {
+        "state_space": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Reference to the state representation (e.g., phase-space, tensor, graph)."
+        },
+        "invariants": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "description": "Conditions that must hold for any state to be considered valid."
+        }
+      }
+    },
+    "decision_model": {
+      "type": "object",
+      "description": "Definition of what constitutes a decision.",
+      "required": ["transition_type", "required_evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "transition_type": {
+          "type": "string",
+          "enum": ["phase_transition", "state_transition", "policy_update"],
+          "description": "How decisions are represented in the state model."
+        },
+        "required_evidence": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "description": "Evidence that must exist for a decision to be replay-admissible."
+        }
+      }
+    },
+    "logging_requirements": {
+      "type": "object",
+      "description": "What must be logged for replay-court admissibility.",
+      "required": ["event_schema", "minimum_fields"],
+      "additionalProperties": false,
+      "properties": {
+        "event_schema": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Reference to the event schema used for cognitive logs (e.g., AgentEvent.v1)."
+        },
+        "minimum_fields": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "description": "Fields that must be present in every logged decision event."
+        }
+      }
+    },
+    "finality_conditions": {
+      "type": "object",
+      "description": "When a cognitive process is allowed to declare finality.",
+      "required": ["allowed_states", "required_checks"],
+      "additionalProperties": false,
+      "properties": {
+        "allowed_states": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "description": "State labels from which finality may be declared."
+        },
+        "required_checks": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "description": "Checks that must pass before finality is valid (e.g., invariants_satisfied, drift_absent)."
+        }
+      }
+    },
+    "drift_detection": {
+      "type": "object",
+      "description": "How cognitive drift is detected before it becomes hallucination.",
+      "required": ["detection_mode", "thresholds", "actions"],
+      "additionalProperties": false,
+      "properties": {
+        "detection_mode": {
+          "type": "string",
+          "enum": ["statistical", "rule_based", "hybrid"]
+        },
+        "thresholds": {
+          "type": "object",
+          "additionalProperties": { "type": "number" },
+          "propertyNames": { "type": "string", "minLength": 1 },
+          "minProperties": 1,
+          "description": "Named thresholds for drift metrics (e.g., max_divergence, max_entropy_delta)."
+        },
+        "actions": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "description": "Actions to take when drift is detected (e.g., abort, quarantine, require_human_review)."
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["created_at", "created_by", "manifold_version"],
+      "additionalProperties": false,
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "manifold_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
