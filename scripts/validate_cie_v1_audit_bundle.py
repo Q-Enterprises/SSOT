@@ -87,6 +87,23 @@ def validate_payload_record(
     payload_copy = dict(payload)
     payload_copy.pop("sha256_payload", None)
     calculated = sha256_hex(canonical_json(payload_copy))
+    if not isinstance(sha256_payload, str):
+        errors.append(
+            ValidationError("sha256_payload must be a hex string", line_number)
+        )
+        return errors
+
+    if len(sha256_payload) != 64 or any(
+        char not in "0123456789abcdef" for char in sha256_payload.lower()
+    ):
+        errors.append(
+            ValidationError(
+                "sha256_payload must be a 64-character lowercase hex string",
+                line_number,
+            )
+        )
+        return errors
+
     if calculated != sha256_payload:
         errors.append(
             ValidationError(
@@ -95,7 +112,9 @@ def validate_payload_record(
             )
         )
 
-    if (run_id, council_attestation_id) not in receipt_index:
+    run_id_value = str(run_id)
+    council_value = str(council_attestation_id)
+    if (run_id_value, council_value) not in receipt_index:
         errors.append(
             ValidationError(
                 "council attestation not found in receipts for run_id binding",
