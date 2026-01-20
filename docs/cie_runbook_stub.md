@@ -24,6 +24,14 @@
 6. **Legacy Component Lockout**
    - Confirm no orchestrator configs reference deprecated `CNE` or `FSV` components.
    - Validate `legacy_deprecations` in `content_integrity_eval.json` are marked `retired`.
+7. **Bundle Validator Gate**
+   - Run the validator harness before execution:
+     ```bash
+     python scripts/validate_cie_v1_audit_bundle.py \
+       --payloads inputs/cie_v1_audit/payloads.ndjson \
+       --receipts ledger/cie_v1/neutrality_receipts.jsonl
+     ```
+   - Abort if any fail-closed required-field, hash, or attestation binding checks fail.
 
 ## 3. Execution Procedure
 1. **Noise Injector Pass**
