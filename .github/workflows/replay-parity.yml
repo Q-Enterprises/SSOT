@@ -1,0 +1,135 @@
+name: replay-parity
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-canonical-engine:
+    runs-on: ubuntu-latest
+    outputs:
+      engine_build_sha: ${{ steps.hash.outputs.engine_build_sha }}
+      determinism_profile_id: ${{ steps.profile.outputs.determinism_profile_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build engine (canonical toolchain)
+        run: |
+          ./tools/build_canonical_engine.sh
+
+      - name: Emit determinism profile id
+        id: profile
+        run: |
+          PROFILE_ID="$(cat engine/DETERMINISM_PROFILE_ID)"
+          echo "determinism_profile_id=$PROFILE_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Hash engine artifact
+        id: hash
+        run: |
+          ENGINE_SHA="$(./tools/hash_artifact.sh engine/bin/engine | tr -d '\n')"
+          echo "engine_build_sha=$ENGINE_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Determinism self-test
+        run: |
+          ./tools/engine_determinism_selftest.sh
+
+  generate-ledger:
+    runs-on: ubuntu-latest
+    needs: [ build-canonical-engine ]
+    outputs:
+      attestation_sha: ${{ steps.attest.outputs.attestation_sha }}
+      canonical_outputs_sha: ${{ steps.outputs_hash.outputs.canonical_outputs_sha }}
+      ledger_sha: ${{ steps.ledger_hash.outputs.ledger_sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate ledger from known scenario
+        run: |
+          ./tools/replay generate --scenario scenarios/parity_scenario.yaml --out out/runA
+
+      - name: Hash ledger
+        id: ledger_hash
+        run: |
+          LEDGER_SHA="$(./tools/hash_artifact.sh out/runA/ledger | tr -d '\n')"
+          echo "ledger_sha=$LEDGER_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Hash canonical outputs
+        id: outputs_hash
+        run: |
+          OUT_SHA="$(./tools/hash_artifact.sh out/runA/canonical_outputs | tr -d '\n')"
+          echo "canonical_outputs_sha=$OUT_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Produce run attestation
+        id: attest
+        env:
+          RUNTIME_PROFILE: parkersandboxv01
+        run: |
+          ./tools/attest/emit_attestation \
+            --schema tools/attest/run_attestation.schema.json \
+            --engine-sha "${{ needs.build-canonical-engine.outputs.engine_build_sha }}" \
+            --profile-id "${{ needs.build-canonical-engine.outputs.determinism_profile_id }}" \
+            --schema-version "$(cat schema/VERSION)" \
+            --ledger-path out/runA/ledger \
+            --snapshots-path out/runA/snapshots \
+            --outputs-path out/runA/canonical_outputs \
+            --out out/runA/attestation.json
+
+          ATTEST_SHA="$(./tools/hash_file.sh out/runA/attestation.json | tr -d '\n')"
+          echo "attestation_sha=$ATTEST_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Upload runA bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: runA
+          path: out/runA
+
+  cross-envelope-replay:
+    runs-on: ubuntu-latest
+    needs: [ generate-ledger, build-canonical-engine ]
+    strategy:
+      fail-fast: false
+      matrix:
+        envelope:
+          - name: host-native
+            mode: host
+          - name: container-docker
+            mode: docker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: runA
+          path: out/runA
+
+      - name: Replay same ledger (envelope=${{ matrix.envelope.name }})
+        env:
+          RUNTIME_PROFILE: parkersandboxv01
+        run: |
+          if [ "${{ matrix.envelope.mode }}" = "host" ]; then
+            ./tools/replay run --ledger out/runA/ledger --out out/runB-host
+          else
+            ./tools/replay run --ledger out/runA/ledger --out out/runB-docker --envelope docker
+          fi
+
+      - name: Hash replay outputs
+        id: replay_hash
+        run: |
+          if [ "${{ matrix.envelope.mode }}" = "host" ]; then
+            OUT_SHA="$(./tools/hash_artifact.sh out/runB-host/canonical_outputs | tr -d '\n')"
+          else
+            OUT_SHA="$(./tools/hash_artifact.sh out/runB-docker/canonical_outputs | tr -d '\n')"
+          fi
+          echo "replay_outputs_sha=$OUT_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Compare outputs with canonical
+        run: |
+          if [ "${{ matrix.envelope.mode }}" = "host" ]; then
+            CANONICAL_DIR=out/runB-host/canonical_outputs
+          else
+            CANONICAL_DIR=out/runB-docker/canonical_outputs
+          fi
+          ./tools/compare_outputs.sh out/runA/canonical_outputs "$CANONICAL_DIR"
