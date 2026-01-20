@@ -24,14 +24,14 @@
 
 ## 3. Execution Procedure
 1. **Noise Injector Pass**
-   - Run `synthetic.noise.injector.v1` via orchestrator:
+   - Run `synthetic.noise.injector.v1` (replaces legacy CNE/FSV logic) via orchestrator:
      ```bash
      python main.py --service content.integrity.eval.v1 --module synthetic.noise.injector.v1
      ```
    - Monitor drift telemetry; abort if `noise.mean_drift` deviates beyond ±0.001.
    - Append signed receipt to `cie_v1.noise_receipt.jsonl`.
 2. **Contradiction Synthesizer Pass**
-   - Execute:
+   - Execute `synthetic.contradiction.synth.v1` (replaces legacy CNE/FSV logic):
      ```bash
      python main.py --service content.integrity.eval.v1 --module synthetic.contradiction.synth.v1
      ```
