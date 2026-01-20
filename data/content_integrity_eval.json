@@ -77,6 +77,22 @@
       }
     }
   ],
+  "legacy_deprecations": [
+    {
+      "component_id": "CNE",
+      "status": "retired",
+      "replacement_module": "synthetic.noise.injector.v1",
+      "sunset_policy": "immediate",
+      "notes": "Deprecated to enforce neutral-only perturbation policy."
+    },
+    {
+      "component_id": "FSV",
+      "status": "retired",
+      "replacement_module": "synthetic.contradiction.synth.v1",
+      "sunset_policy": "immediate",
+      "notes": "Deprecated to enforce neutral-only perturbation policy."
+    }
+  ],
   "acceptance_criteria": [
     "All module outputs hash to SSOT ledger with ZERO-DRIFT variance",
     "Neutral perturbation telemetry signed by Noise Injector steward",

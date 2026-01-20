@@ -21,6 +21,9 @@
 5. **Model Policy Affirmation**
    - Confirm `runtime_guardrails.model_policy.perturbation_models` is set to `neutral_only` in `content_integrity_eval.json`.
    - Verify no adversarial or unvetted model sources are referenced in module configs or operator overrides.
+6. **Legacy Component Lockout**
+   - Confirm no orchestrator configs reference deprecated `CNE` or `FSV` components.
+   - Validate `legacy_deprecations` in `content_integrity_eval.json` are marked `retired`.
 
 ## 3. Execution Procedure
 1. **Noise Injector Pass**
