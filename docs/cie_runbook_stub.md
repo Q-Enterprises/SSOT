@@ -63,6 +63,12 @@ Use this guidance to complete the 10-step Zap flow for CIE-V1 audit events.
 The webhook represents **CIE-V1 audit state transitions** emitted by the orchestrator. Each event should describe the batch, module, and audit outcome to drive routing and logging.
 
 ### 5.2 Recommended Payload Schema
+**Deterministic replayability guidelines**
+- **Primary key**: Compose a stable key such as `run_id:vehicle_id:tick` to uniquely identify each frame and prevent collisions under high-velocity telemetry.
+- **Normalized timestamps**: Use `timestamp_ms` for millisecond precision to align downstream ordering and replay.
+- **Flattened metrics**: Promote core metrics (e.g., `speed_mps`, `accel_ms2`, `g_force`) to the root for faster filtering and UI responsiveness.
+- **Advisory status**: Compute `status_label` on the backend from raw `accel_ms2` values instead of trusting simulator-provided labels.
+
 ```json
 {
   "event_type": "cie_v1.audit.transition",
@@ -70,6 +76,15 @@ The webhook represents **CIE-V1 audit state transitions** emitted by the orchest
   "epoch_id": "epoch-2026-01",
   "module_id": "synthetic.noise.injector.v1",
   "status": "COMPLETED",
+  "run_id": "cie-v1-2026-01-20T15:05:00Z",
+  "vehicle_id": "vehicle-01",
+  "tick": 1280,
+  "frame_key": "cie-v1-2026-01-20T15:05:00Z:vehicle-01:1280",
+  "timestamp_ms": 1768911900000,
+  "speed_mps": 12.4,
+  "accel_ms2": 0.17,
+  "g_force": 0.017,
+  "status_label": "LAMINAR",
   "drift_metrics": {
     "noise_mean_drift": 0.0004,
     "noise_variance": 0.012
@@ -193,3 +208,98 @@ Use repository configuration from ops settings:
 - **Integrity Guild Hotline**: `world-engine://integrity-guild/contact`
 - **Ethics Gateway Pager**: `world-engine://ethics-gateway/page`
 - **Fallback**: Suspend CIE-V1 operations and notify World Engine council.
+
+## 8. Sovereign Validation Artifacts
+Use the following receipts, policies, and replay scripts when validating CIE-V1 operations under sovereign governance constraints.
+
+### 8.1 AgentProposalReceipt.v1 (YAML)
+```yaml
+schema_version: AgentProposalReceipt.v1
+receipt_id: "{{uuid}}"
+proposal_id: "{{proposal_id}}"
+timestamp_utc: "{{timestamp}}"
+
+provenance:
+  github_run_id: "{{github_run_id}}"
+  oidc_identity: "https://github.com/{{org}}/{{repo}}/.github/workflows/agent-pr.yml@refs/heads/main"
+  validator_version: "pydantic-sovereign-suite-1.0.2"
+
+logic_proof:
+  s1_structural_pass: true
+  p1_air_gap_pass: true
+  b1_offline_mode: true
+  h1_gate_seal: "GOLDEN_SNAPSHOT_VERIFIED"
+  validation_summary: "Payload satisfies all 4 Sovereign Invariants. KCT 64-D projection within safety bounds."
+
+attestation:
+  kct_hash: "sha256:{{sha256_of_kernel_control_token}}"
+  snapshot_ref: "fossil://{{golden_snapshot_id}}"
+  signer_address: "{{metamask_public_address}}"
+
+digest: "{{sha256_of_canonical_receipt_without_digest}}"
+```
+
+### 8.2 OPA Policy: Sovereign Invariants (Rego)
+```rego
+package validation.sovereign
+
+import future.keywords.if
+
+default allow = false
+
+# S1: Must include a validated artifact
+violation[msg] if {
+    not input.drift_receipt
+    not input.agent_checkpoint
+    msg := "S1 Violation: Missing required DriftReceipt or AgentCheckpoint."
+}
+
+# P1: Air-Gap enforcement for file paths
+violation[msg] if {
+    input.agent_role == "INFRA"
+    not startswith(input.target_path, "charts/")
+    msg := "P1 Violation: INFRA agent attempted to access restricted path."
+}
+
+violation[msg] if {
+    input.agent_role == "POLICY"
+    not startswith(input.target_path, "policy/")
+    msg := "P1 Violation: POLICY agent attempted to access restricted path."
+}
+
+# H1: Human approval for production impact
+violation[msg] if {
+    input.requires_human_approval == true
+    not input.golden_snapshot
+    msg := "H1 Violation: Production-impacting change missing GoldenSnapshot artifact."
+}
+
+allow if {
+    count(violation) == 0
+}
+```
+
+### 8.3 Replay-Court Reconstruction Script (Python Kernel)
+```python
+import hashlib
+import json
+import yaml
+
+def canonicalize_jcs(data: dict) -> str:
+    """Implements JSON Canonicalization Scheme (RFC 8785) for YAML objects."""
+    return json.dumps(data, sort_keys=True, separators=(',', ':'))
+
+def verify_fossil(path_to_yaml: str) -> bool:
+    """Verifies the integrity of a fossil artifact against its digest."""
+    with open(path_to_yaml, 'r') as f:
+        artifact = yaml.safe_load(f)
+    
+    provided_digest = artifact.pop('digest')
+    computed_digest = hashlib.sha256(canonicalize_jcs(artifact).encode()).hexdigest()
+    
+    return provided_digest == computed_digest
+
+# Kernel usage:
+# if verify_fossil("validation/fossils/AgentProposalReceipt.v1.yaml"):
+#     engage_replay_court()
+```
