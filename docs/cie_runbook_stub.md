@@ -4,6 +4,7 @@
 - **Service**: `content.integrity.eval.v1`
 - **Mandates**: ZERO-DRIFT, Ethical Compliance
 - **Objective**: Validate content robustness using neutral perturbations and contradiction analysis without introducing bias.
+- **Module Shift**: `synthetic.noise.injector.v1` and `synthetic.contradiction.synth.v1` replace legacy CNE/FSV flows for neutral-only perturbation coverage.
 
 ## 2. Pre-Run Checklist
 1. **Bundle Registration**
@@ -21,20 +22,20 @@
 5. **Model Policy Affirmation**
    - Confirm `runtime_guardrails.model_policy.perturbation_models` is set to `neutral_only` in `content_integrity_eval.json`.
    - Verify no adversarial or unvetted model sources are referenced in module configs or operator overrides.
-6. **Module Transition Check**
-   - Confirm deprecated modules (`synthetic.cne.v1`, `synthetic.fsv.v1`) are not scheduled or referenced in the current run.
-   - Record the transition note in the run log for audit continuity.
+6. **Legacy Flow Lockout**
+   - Confirm no runbooks or schedulers reference legacy CNE/FSV modules.
+   - Record lockout confirmation in `cie_v1.audit_report.md` metadata.
 
 ## 3. Execution Procedure
 1. **Noise Injector Pass**
-   - Run `synthetic.noise.injector.v1` via orchestrator:
+   - Run `synthetic.noise.injector.v1` (replaces legacy CNE/FSV logic) via orchestrator:
      ```bash
      python main.py --service content.integrity.eval.v1 --module synthetic.noise.injector.v1
      ```
    - Monitor drift telemetry; abort if `noise.mean_drift` deviates beyond ±0.001.
    - Append signed receipt to `cie_v1.noise_receipt.jsonl`.
 2. **Contradiction Synthesizer Pass**
-   - Execute:
+   - Execute `synthetic.contradiction.synth.v1` (replaces legacy CNE/FSV logic):
      ```bash
      python main.py --service content.integrity.eval.v1 --module synthetic.contradiction.synth.v1
      ```
@@ -130,6 +131,63 @@ Create a PR when Path B triggers to capture remediation steps. Suggested content
 - Audit report, noise receipt, and contradiction ledger all present in SSOT with matching hashes.
 - ZERO-DRIFT attestation captured in ledger.
 - Model policy attestation confirming exclusive use of neutral perturbation models recorded alongside guardrail receipts.
+
+## 6. Zapier Automation Notes (CIE-V1 Audit Webhook)
+Use the webhook to publish **CIE-V1 state transitions** so downstream ops can track audits, update Airtable, and open GitHub PRs for remediation when failures occur.
+
+### 6.1 Webhook Payload Intent
+The webhook payload should:
+1. Identify the audit run and batch context.
+2. Report the current state (`PENDING`, `RUNNING`, `COMPLETED`, `ESCALATED`).
+3. Surface key compliance signals (drift, contradiction deltas, signature status).
+4. Provide artifact links for Airtable tracking and GitHub PR context.
+
+### 6.2 Payload Schema (minimal)
+```json
+{
+  "service_id": "content.integrity.eval.v1",
+  "batch_id": "batch-2026-01-20-001",
+  "epoch_id": "epoch-2026-01",
+  "run_id": "cie-v1-2026-01-20T15:05:00Z",
+  "state": "COMPLETED",
+  "metrics": {
+    "noise_mean_drift": 0.0004,
+    "noise_variance": 0.0081,
+    "contradiction_resolution_delta": 0.02,
+    "signature_ok": false
+  },
+  "artifacts": {
+    "audit_report_url": "ssot://cie_v1/audit/2026-01-20/report.md",
+    "noise_receipt_url": "ssot://cie_v1/audit/2026-01-20/noise_receipt.jsonl",
+    "contradiction_ledger_url": "ssot://cie_v1/audit/2026-01-20/contradiction_ledger.jsonl"
+  },
+  "owner": "World Engine Integrity Guild"
+}
+```
+
+### 6.3 Airtable Mapping (Path A)
+Configure Airtable base/table via environment variables or orchestrator config. Required field mappings:
+- **Search field**: `batch_id`
+- **Update fields**:
+  - `state`
+  - `run_id`
+  - `noise_mean_drift`
+  - `noise_variance`
+  - `contradiction_resolution_delta`
+  - `signature_ok`
+  - `audit_report_url`
+  - `updated_at` (set to webhook receipt timestamp)
+
+### 6.4 Path Conditions
+- **Path A (Airtable update)**: run when `state` is `RUNNING` or `COMPLETED`.
+- **Path B (GitHub PR)**: run when `state` is `ESCALATED` or when `metrics.noise_mean_drift` exceeds ±0.001.
+
+### 6.5 GitHub PR Details (Path B)
+Use repository configuration from ops settings:
+- **Repo**: `world-engine/ssot` (override as needed)
+- **Target branch**: `main`
+- **Title**: `CIE-V1 audit escalation: <batch_id>`
+- **Body**: include `run_id`, `state`, metrics summary, and artifact URLs from the webhook payload.
 
 ## 7. Escalation Path
 - **Integrity Guild Hotline**: `world-engine://integrity-guild/contact`
