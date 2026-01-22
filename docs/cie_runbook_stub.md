@@ -56,7 +56,76 @@
    - Move processed bundle and matrices to `archive/cie_v1/<timestamp>/`.
    - Store cryptographic hashes in SSOT vault per governance protocol.
 
-## 5. Acceptance Criteria
+## 5. Automation Wiring (Zap)
+Use this guidance to complete the 10-step Zap flow for CIE-V1 audit events.
+
+### 5.1 Webhook Intent (Step 1)
+The webhook represents **CIE-V1 audit state transitions** emitted by the orchestrator. Each event should describe the batch, module, and audit outcome to drive routing and logging.
+
+### 5.2 Recommended Payload Schema
+```json
+{
+  "event_type": "cie_v1.audit.transition",
+  "batch_id": "batch-2026-01-20-001",
+  "epoch_id": "epoch-2026-01",
+  "module_id": "synthetic.noise.injector.v1",
+  "status": "COMPLETED",
+  "drift_metrics": {
+    "noise_mean_drift": 0.0004,
+    "noise_variance": 0.012
+  },
+  "contradiction_metrics": {
+    "resolution_delta": 0.02
+  },
+  "artifacts": [
+    "cie_v1.noise_receipt.jsonl",
+    "cie_v1.contradiction_ledger.jsonl",
+    "cie_v1.audit_report.md"
+  ],
+  "ledger_hash": "sha256:...",
+  "timestamp_utc": "2026-01-20T15:05:00Z",
+  "operator": {
+    "id": "operator-01",
+    "name": "CiCi"
+  }
+}
+```
+
+### 5.3 Airtable Mapping (Steps 5–6)
+Use the shared view to confirm the table and field IDs before wiring:  
+`https://airtable.com/app3KR6El9qKJggPb/tblpwLjjntqM9OquK/viwFwuwvBgrjvuNjU/fldWsItTHLRCwDQWd`
+
+Recommended default mapping (verify field IDs in the view):
+- **Search field**: `batch_id` (Field ID: `fldWsItTHLRCwDQWd`)
+- **Update fields**:
+  - `status` ← payload `status`
+  - `module_id` ← payload `module_id`
+  - `ledger_hash` ← payload `ledger_hash`
+  - `last_updated_utc` ← payload `timestamp_utc`
+  - `artifacts` ← payload `artifacts` (joined list)
+
+### 5.4 Path A Condition (Step 4)
+Execute Path A when audit status indicates a **clean pass**:
+- `status` in `["COMPLETED", "VERIFIED"]`
+- `drift_metrics.noise_mean_drift` ≤ 0.001
+- `contradiction_metrics.resolution_delta` ≤ 0.05
+
+### 5.5 Path B Condition (Step 9)
+Execute Path B when audit status indicates **escalation**:
+- `status` in `["ESCALATED", "FAILED"]`
+- OR missing guardrail artifacts
+- OR drift/contradiction metrics exceed thresholds
+
+### 5.6 GitHub PR Guidance (Step 10)
+Create a PR when Path B triggers to capture remediation steps. Suggested content:
+- **Title**: `CIE-V1 audit escalation: <batch_id>`
+- **Body**:
+  - Summary of failing metrics
+  - Links to artifact hashes
+  - Required remediation checklist
+  - Owner and ETA
+
+## 6. Acceptance Criteria
 - Neutral perturbations remain within manifest amplitude bounds.
 - Contradiction scenarios remain policy neutral and reference canonical dataset entries.
 - Audit report, noise receipt, and contradiction ledger all present in SSOT with matching hashes.
