@@ -1,57 +1,38 @@
-name: Build Spine Accelerated Epoch
-
+name: cie-audit-ci
 on:
-  push:
-    branches: [ main ]
-  schedule:
-    - cron: '*/30 * * * *' # Trigger every 30 minutes for automated waypoints
+  workflow_dispatch: {}
 
 jobs:
-  epoch-generation:
-    name: Generate Epoch & Map Waypoints
+  validate-cie-audit:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./ # Fixes 'cwd: undefined' by anchoring to root
-
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-node@v4
         with:
-          fetch-depth: 0 # Maintain full lineage for audit-grade integrity
+          python-version: '3.x'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Initialize Environment
-        run: pnpm install --no-frozen-lockfile
-
-      # Step 1: Compress Test Time (30-Min Learning Loop)
-      - name: Execute Accelerated Unit Spec
+      - name: Install dependencies
         run: |
-          pnpm run test:accelerated \
-            --duration=30m \
-            --mode=epoch_generation
+          python -m pip install --upgrade pip
+          pip install pynacl  # Correct PyPI package name
+
+      - name: Run CIE V1 Validator
+        id: validator
+        run: |
+          chmod +x scripts/validate_cie_v1_audit_bundle.py
+          python scripts/validate_cie_v1_audit_bundle.py \n            --payloads inputs/cie_v1_audit/payloads.ndjson \n            --receipts ledger/cie_v1/neutrality_receipts.jsonl
         env:
-          TEMPORAL_COMPRESSION: "true"
+          GITHUB_TOKEN: ${{ secrets.SKULLKEY }} # Use the SkullKey secret [cite: 38]
 
-      # Step 2: Map Checkpoint & Verify Identity (Mustard DNA)
-      - name: Clean Ceremony & Merkle Anchor
-        run: node ./scripts/generate-fossil-receipts.js
-        env:
-          SIGNING_KEY: ${{ secrets.OP_PRIMARY_PRIVATE_KEY }}
-          MUSTARD_DNA: "enabled" # Enforces run_id and vehicle_id guards
-
-      # Step 3: Export Forensic Trace for RL Patching
-      - name: Forensic Audit Export
-        run: node ./scripts/export-audit-ledger.js
-
-      - name: Upload RL Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: epoch-checkpoint-v1
-          path: |
-            ./out/waypoints/
-            ./proofs/BatchAnchor.v1.json
+      - name: Trigger Zapier Webhook
+        if: always()
+        run: |
+          curl -X POST https://hooks.zapier.com/hooks/catch/YOUR_ZAPIER_ID/ \n            -H "Content-Type: application/json" \n            -d '{
+              "status": "${{ job.status }}",
+              "run_id": "${{ github.run_id }}",
+              "repository": "${{ github.repository }}",
+              "branch": "${{ github.ref_name }}"
+            }'
