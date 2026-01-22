@@ -23,18 +23,14 @@ jobs:
         id: validator
         run: |
           chmod +x scripts/validate_cie_v1_audit_bundle.py
-          python scripts/validate_cie_v1_audit_bundle.py \
-            --payloads inputs/cie_v1_audit/payloads.ndjson \
-            --receipts ledger/cie_v1/neutrality_receipts.jsonl
+          python scripts/validate_cie_v1_audit_bundle.py \n            --payloads inputs/cie_v1_audit/payloads.ndjson \n            --receipts ledger/cie_v1/neutrality_receipts.jsonl
         env:
           GITHUB_TOKEN: ${{ secrets.SKULLKEY }} # Use the SkullKey secret [cite: 38]
 
       - name: Trigger Zapier Webhook
         if: always()
         run: |
-          curl -X POST https://hooks.zapier.com/hooks/catch/YOUR_ZAPIER_ID/ \
-            -H "Content-Type: application/json" \
-            -d '{
+          curl -X POST https://hooks.zapier.com/hooks/catch/YOUR_ZAPIER_ID/ \n            -H "Content-Type: application/json" \n            -d '{
               "status": "${{ job.status }}",
               "run_id": "${{ github.run_id }}",
               "repository": "${{ github.repository }}",
