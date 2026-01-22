@@ -21,17 +21,28 @@
 5. **Model Policy Affirmation**
    - Confirm `runtime_guardrails.model_policy.perturbation_models` is set to `neutral_only` in `content_integrity_eval.json`.
    - Verify no adversarial or unvetted model sources are referenced in module configs or operator overrides.
+6. **Legacy Component Lockout**
+   - Confirm no orchestrator configs reference deprecated `CNE` or `FSV` components.
+   - Validate `legacy_deprecations` in `content_integrity_eval.json` are marked `retired`.
+7. **Bundle Validator Gate**
+   - Run the validator harness before execution:
+     ```bash
+     python scripts/validate_cie_v1_audit_bundle.py \
+       --payloads inputs/cie_v1_audit/payloads.ndjson \
+       --receipts ledger/cie_v1/neutrality_receipts.jsonl
+     ```
+   - Abort if any fail-closed required-field, hash, or attestation binding checks fail.
 
 ## 3. Execution Procedure
 1. **Noise Injector Pass**
-   - Run `synthetic.noise.injector.v1` via orchestrator:
+   - Run `synthetic.noise.injector.v1` (replaces legacy CNE/FSV logic) via orchestrator:
      ```bash
      python main.py --service content.integrity.eval.v1 --module synthetic.noise.injector.v1
      ```
    - Monitor drift telemetry; abort if `noise.mean_drift` deviates beyond ±0.001.
    - Append signed receipt to `cie_v1.noise_receipt.jsonl`.
 2. **Contradiction Synthesizer Pass**
-   - Execute:
+   - Execute `synthetic.contradiction.synth.v1` (replaces legacy CNE/FSV logic):
      ```bash
      python main.py --service content.integrity.eval.v1 --module synthetic.contradiction.synth.v1
      ```
