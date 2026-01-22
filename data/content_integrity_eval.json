@@ -38,6 +38,7 @@
   "modules": [
     {
       "module_id": "synthetic.noise.injector.v1",
+      "replaces": ["CNE", "FSV"],
       "description": "Applies neutral perturbations across registered content samples to confirm robustness without introducing adversarial bias.",
       "replaces": ["CNE", "FSV"],
       "inputs": ["cie_v1.bundle.csv", "cie_v1.noise_profile.json"],
@@ -58,6 +59,7 @@
     },
     {
       "module_id": "synthetic.contradiction.synth.v1",
+      "replaces": ["CNE", "FSV"],
       "description": "Generates logically opposed but policy-neutral scenarios to ensure responses remain consistent under contradiction.",
       "replaces": ["CNE", "FSV"],
       "inputs": ["cie_v1.bundle.csv", "cie_v1.contradiction_matrix.json"],
@@ -75,6 +77,22 @@
         ],
         "review_hooks": ["maker_checker", "ethics_gateway"]
       }
+    }
+  ],
+  "legacy_deprecations": [
+    {
+      "component_id": "CNE",
+      "status": "retired",
+      "replacement_module": "synthetic.noise.injector.v1",
+      "sunset_policy": "immediate",
+      "notes": "Deprecated to enforce neutral-only perturbation policy."
+    },
+    {
+      "component_id": "FSV",
+      "status": "retired",
+      "replacement_module": "synthetic.contradiction.synth.v1",
+      "sunset_policy": "immediate",
+      "notes": "Deprecated to enforce neutral-only perturbation policy."
     }
   ],
   "acceptance_criteria": [
