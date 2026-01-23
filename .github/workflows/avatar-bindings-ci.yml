@@ -1,16 +1,17 @@
 name: Avatar Bindings CI
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   validate-and-seal:
-    name: validate-and-seal
     runs-on: ubuntu-latest
     env:
       CONSOLIDATED_MANIFEST: dist/consolidated-manifest.json
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -18,56 +19,31 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
-          cache: 'npm'
-          cache-dependency-path: verify/package.json
+          node-version: '20'
 
-      - name: Install avv CLI
+      - name: Install dependencies
         run: |
-          set -euo pipefail
-          trap 'echo "::error::Failed to install avv CLI"' ERR
-          npm install -g avv
-        shell: bash
+          npm install --no-save ajv-cli
+          # Ensure pnpm version is locked if used elsewhere in the spine
+          # pnpm@9.1.0 is the standard governance version
 
-      - name: Setup Python 3.x
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-          cache: 'pip'
-          cache-dependency-path: requirements.txt
-
-      - name: Install Python dependencies
+      - name: Validate source manifest
         run: |
-          set -euo pipefail
-          trap 'echo "::error::Python dependency installation failed"' ERR
-          pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          else
-            echo "::error::requirements.txt not found"
-            exit 1
-          fi
-        shell: bash
-
-      - name: Validate manifest schema
-        run: |
-          set -euo pipefail
-          trap 'echo "::error::Manifest schema validation failed"' ERR
           if [ ! -f manifest.json ]; then
             echo "::error::manifest.json not found"
             exit 1
           fi
-          npx --yes ajv-cli validate -d manifest.json
+          npx ajv validate -d manifest.json
         shell: bash
 
-      - name: Consolidate manifest
+      - name: Consolidate manifest (Canonical RFC 8785)
         run: |
           set -euo pipefail
-          trap 'echo "::error::Manifest consolidation failed"' ERR
           mkdir -p dist
+          # The consolidation script must enforce lexicographical key sorting
           node scripts/consolidate.js
           if [ ! -f "$CONSOLIDATED_MANIFEST" ]; then
-            echo "::error::Expected consolidated manifest at $CONSOLIDATED_MANIFEST"
+            echo "::error::Consolidated manifest failed to generate at $CONSOLIDATED_MANIFEST"
             exit 1
           fi
         shell: bash
@@ -76,48 +52,36 @@ jobs:
         run: |
           set -euo pipefail
           trap 'echo "::error::Hashing or signing failed"' ERR
-          if [ -z "${MANIFEST_PRIVATE_KEY:-}" ]; then
-            echo "::error::MANIFEST_PRIVATE_KEY secret is not set"
-            exit 1
-          fi
-          if [ ! -f "$CONSOLIDATED_MANIFEST" ]; then
-            echo "::error::Consolidated manifest not found at $CONSOLIDATED_MANIFEST"
-            exit 1
-          fi
+          
+          # Hash generation for Merkle Root anchoring
+          sha256sum "$CONSOLIDATED_MANIFEST" | cut -d ' ' -f1 > dist/consolidated-manifest.sha256
+          
+          # Digital signature using the Sovereign OS private key
           printf '%s\n' "$MANIFEST_PRIVATE_KEY" > manifest_signing_key.pem
           chmod 600 manifest_signing_key.pem
-          sha256sum "$CONSOLIDATED_MANIFEST" | tee dist/consolidated-manifest.sha256
           openssl dgst -sha256 -sign manifest_signing_key.pem -out dist/consolidated-manifest.sig.bin "$CONSOLIDATED_MANIFEST"
           openssl base64 -in dist/consolidated-manifest.sig.bin -out dist/consolidated-manifest.sig
-          rm dist/consolidated-manifest.sig.bin
-          rm manifest_signing_key.pem
+          
+          # Cleanup sensitive artifacts
+          rm dist/consolidated-manifest.sig.bin manifest_signing_key.pem
         shell: bash
         env:
           MANIFEST_PRIVATE_KEY: ${{ secrets.MANIFEST_PRIVATE_KEY }}
 
-      - name: Emit ledger event
+      - name: Emit ledger event to World Engine
         run: |
           set -euo pipefail
-          trap 'echo "::error::Failed to emit ledger event"' ERR
-          if [ -z "${LEDGER_ENDPOINT:-}" ]; then
-            echo "::error::LEDGER_ENDPOINT secret is not set"
-            exit 1
-          fi
-          if [ -z "${LEDGER_API_KEY:-}" ]; then
-            echo "::error::LEDGER_API_KEY secret is not set"
-            exit 1
-          fi
-          HASH_VALUE=$(cut -d ' ' -f1 dist/consolidated-manifest.sha256)
+          HASH_VALUE=$(cat dist/consolidated-manifest.sha256)
           curl -sSf -X POST "$LEDGER_ENDPOINT" \
             -H "Authorization: Bearer $LEDGER_API_KEY" \
             -H 'Content-Type: application/json' \
-            -d "{\"manifestSha256\":\"$HASH_VALUE\"}"
+            -d "{\"manifestSha256\":\"$HASH_VALUE\", \"event\":\"BINDING_SEALED\"}"
         shell: bash
         env:
           LEDGER_API_KEY: ${{ secrets.LEDGER_API_KEY }}
           LEDGER_ENDPOINT: ${{ secrets.LEDGER_ENDPOINT }}
 
-      - name: Upload manifest artifacts
+      - name: Upload sealed artifacts
         uses: actions/upload-artifact@v4
         with:
           name: avatar-bindings-manifest
