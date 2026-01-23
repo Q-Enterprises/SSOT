@@ -1,92 +1,91 @@
-name: Avatar Bindings CI
+name: Avatar Bindings CI [cite: 53]
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [cite: 53]
+  push: [cite: 53]
+    branches: [ main ] [cite: 53]
+  pull_request: [cite: 53]
+    branches: [ main ] [cite: 53]
 
-jobs:
-  validate-and-seal:
-    runs-on: ubuntu-latest
-    env:
-      CONSOLIDATED_MANIFEST: dist/consolidated-manifest.json
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+jobs: [cite: 53]
+  validate-and-seal: [cite: 53]
+    runs-on: ubuntu-latest [cite: 53]
+    env: [cite: 53]
+      CONSOLIDATED_MANIFEST: dist/consolidated-manifest.json [cite: 53]
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+    steps: [cite: 53]
+      - name: Checkout repository [cite: 53]
+        uses: actions/checkout@v4 [cite: 53]
 
-      - name: Install dependencies
-        run: |
-          npm install --no-save ajv-cli
-          # Ensure pnpm version is locked if used elsewhere in the spine
-          # pnpm@9.1.0 is the standard governance version
+      - name: Setup Node.js [cite: 53]
+        uses: actions/setup-node@v4 [cite: 53]
+        with: [cite: 53]
+          node-version: '20' [cite: 53]
 
-      - name: Validate source manifest
-        run: |
-          if [ ! -f manifest.json ]; then
-            echo "::error::manifest.json not found"
-            exit 1
-          fi
-          npx ajv validate -d manifest.json
-        shell: bash
+      - name: Install dependencies [cite: 53]
+        run: | [cite: 53]
+          npm install --no-save ajv-cli [cite: 53]
+          # Ensure pnpm version is locked if used elsewhere in the spine 
+          # pnpm@9.1.0 is the standard governance version 
 
-      - name: Consolidate manifest (Canonical RFC 8785)
-        run: |
-          set -euo pipefail
-          mkdir -p dist
-          # The consolidation script must enforce lexicographical key sorting
-          node scripts/consolidate.js
-          if [ ! -f "$CONSOLIDATED_MANIFEST" ]; then
-            echo "::error::Consolidated manifest failed to generate at $CONSOLIDATED_MANIFEST"
-            exit 1
-          fi
-        shell: bash
+      - name: Validate source manifest [cite: 53]
+        run: | [cite: 53]
+          if [ ! -f manifest.json ]; then [cite: 53]
+            echo "::error::manifest.json not found" [cite: 53]
+            exit 1 [cite: 53]
+          fi [cite: 53]
+          npx ajv validate -d manifest.json [cite: 53]
+        shell: bash [cite: 53]
 
-      - name: Hash and sign consolidated manifest
-        run: |
-          set -euo pipefail
-          trap 'echo "::error::Hashing or signing failed"' ERR
+      - name: Consolidate manifest (Canonical RFC 8785) [cite: 53]
+        run: | [cite: 53]
+          set -euo pipefail [cite: 53]
+          mkdir -p dist [cite: 53]
+          # The consolidation script must enforce lexicographical key sorting 
+          node scripts/consolidate.js [cite: 53]
+          if [ ! -f "$CONSOLIDATED_MANIFEST" ]; then [cite: 53]
+            echo "::error:: Consolidated manifest failed to generate at $CONSOLIDATED_MANIFEST" [cite: 53]
+            exit 1 [cite: 53]
+          fi [cite: 53]
+        shell: bash [cite: 53]
+
+      - name: Hash and sign consolidated manifest [cite: 53]
+        run: | [cite: 53]
+          set -euo pipefail [cite: 53]
+          trap 'echo "::error::Hashing or signing failed"' ERR [cite: 53]
           
-          # Hash generation for Merkle Root anchoring
-          sha256sum "$CONSOLIDATED_MANIFEST" | cut -d ' ' -f1 > dist/consolidated-manifest.sha256
+          # Hash generation for Merkle Root anchoring 
+          sha256sum "$CONSOLIDATED_MANIFEST" | cut -d ' ' -f1 > dist/consolidated-manifest.sha256 [cite: 53]
           
-          # Digital signature using the Sovereign OS private key
-          printf '%s\n' "$MANIFEST_PRIVATE_KEY" > manifest_signing_key.pem
-          chmod 600 manifest_signing_key.pem
-          openssl dgst -sha256 -sign manifest_signing_key.pem -out dist/consolidated-manifest.sig.bin "$CONSOLIDATED_MANIFEST"
-          openssl base64 -in dist/consolidated-manifest.sig.bin -out dist/consolidated-manifest.sig
+          # Digital signature using the Sovereign OS private key 
+          printf '%s\n' "$MANIFEST_PRIVATE_KEY" > manifest_signing_key.pem [cite: 53]
+          chmod 600 manifest_signing_key.pem [cite: 53]
+          openssl dgst -sha256 -sign manifest_signing_key.pem -out dist/consolidated-manifest.sig.bin "$CONSOLIDATED_MANIFEST" [cite: 53]
+          openssl base64 -in dist/consolidated-manifest.sig.bin -out dist/consolidated-manifest.sig [cite: 53]
           
-          # Cleanup sensitive artifacts
-          rm dist/consolidated-manifest.sig.bin manifest_signing_key.pem
-        shell: bash
-        env:
-          MANIFEST_PRIVATE_KEY: ${{ secrets.MANIFEST_PRIVATE_KEY }}
+          # Cleanup sensitive artifacts 
+          rm dist/consolidated-manifest.sig.bin manifest_signing_key.pem [cite: 53]
+        shell: bash [cite: 53]
+        env: [cite: 53]
+          MANIFEST_PRIVATE_KEY: ${{ secrets.MANIFEST_PRIVATE_KEY }} [cite: 53]
 
-      - name: Emit ledger event to World Engine
-        run: |
-          set -euo pipefail
-          HASH_VALUE=$(cat dist/consolidated-manifest.sha256)
-          curl -sSf -X POST "$LEDGER_ENDPOINT" \
-            -H "Authorization: Bearer $LEDGER_API_KEY" \
-            -H 'Content-Type: application/json' \
-            -d "{\"manifestSha256\":\"$HASH_VALUE\", \"event\":\"BINDING_SEALED\"}"
-        shell: bash
-        env:
-          LEDGER_API_KEY: ${{ secrets.LEDGER_API_KEY }}
-          LEDGER_ENDPOINT: ${{ secrets.LEDGER_ENDPOINT }}
+      - name: Emit ledger event to World Engine [cite: 53]
+        run: | [cite: 53]
+          set -euo pipefail [cite: 53]
+          HASH_VALUE=$(cat dist/consolidated-manifest.sha256) [cite: 53]
+          curl -sSf -X POST "$LEDGER_ENDPOINT" \ [cite: 53]
+            -H "Authorization: Bearer $LEDGER_API_KEY" \ [cite: 53]
+            -H 'Content-Type: application/json' \ [cite: 53]
+            -d "{\"manifestSha256\":\"$HASH_VALUE\" , \"event\":\"BINDING_SEALED\" }" [cite: 53]
+        shell: bash [cite: 53]
+        env: [cite: 53]
+          LEDGER_API_KEY: ${{ secrets.LEDGER_API_KEY }} [cite: 53]
+          LEDGER_ENDPOINT: ${{ secrets.LEDGER_ENDPOINT }} [cite: 53]
 
-      - name: Upload sealed artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: avatar-bindings-manifest
-          path: |
-            ${{ env.CONSOLIDATED_MANIFEST }}
-            dist/consolidated-manifest.sha256
-            dist/consolidated-manifest.sig
-          if-no-files-found: error
+      - name: Upload sealed artifacts [cite: 53]
+        uses: actions/upload-artifact@v4 [cite: 53]
+        with: [cite: 53]
+          name: avatar-bindings-manifest [cite: 53]
+          path: | [cite: 53]
+            dist/consolidated-manifest.json [cite: 53]
+            dist/consolidated-manifest.sha256 [cite: 53]
+            dist/consolidated-manifest.sig [cite: 53]
