@@ -33,7 +33,11 @@ jobs:
             echo "::error::manifest.json not found"
             exit 1
           fi
-          npx ajv validate -d manifest.json
+          if [ ! -f schemas/manifest.schema.json ]; then
+            echo "::error::schemas/manifest.schema.json not found"
+            exit 1
+          fi
+          npx ajv validate -s schemas/manifest.schema.json -d manifest.json
         shell: bash
 
       - name: Consolidate manifest (Canonical RFC 8785)
