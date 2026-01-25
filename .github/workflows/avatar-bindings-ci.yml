@@ -23,12 +23,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          ls -la package.json package-lock.json
+          npm ci --verbose
           # Ensure pnpm version is locked if used elsewhere in the spine
           # pnpm@9.1.0 is the standard governance version
 
       - name: Validate source manifest
-        run: node scripts/validate-manifest.js
+        run: |
+          echo "Validating manifest..."
+          ls -la scripts/validate-manifest.js manifest.json schemas/manifest.schema.json
+          node scripts/validate-manifest.js
         shell: bash
 
       - name: Consolidate manifest (Canonical RFC 8785)
