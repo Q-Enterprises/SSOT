@@ -4,3 +4,6 @@ verify/node_modules/
 .env
 coverage/
 *.log
+__pycache__/
+*.pyc
+.pytest_cache/
