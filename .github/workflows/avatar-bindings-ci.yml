@@ -23,17 +23,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install --no-save ajv-cli
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          ls -la package.json package-lock.json
+          npm ci --verbose
           # Ensure pnpm version is locked if used elsewhere in the spine
           # pnpm@9.1.0 is the standard governance version
 
       - name: Validate source manifest
         run: |
-          if [ ! -f manifest.json ]; then
-            echo "::error::manifest.json not found"
-            exit 1
-          fi
-          npx ajv validate -d manifest.json
+          echo "Validating manifest..."
+          ls -la scripts/validate-manifest.js manifest.json schemas/manifest.schema.json
+          node scripts/validate-manifest.js
         shell: bash
 
       - name: Consolidate manifest (Canonical RFC 8785)
@@ -49,6 +50,7 @@ jobs:
         shell: bash
 
       - name: Hash and sign consolidated manifest
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           set -euo pipefail
           trap 'echo "::error::Hashing or signing failed"' ERR
@@ -68,7 +70,16 @@ jobs:
         env:
           MANIFEST_PRIVATE_KEY: ${{ secrets.MANIFEST_PRIVATE_KEY }}
 
+      - name: Hash consolidated manifest (PR only)
+        if: github.event_name == 'pull_request'
+        run: |
+          # Generate hash only for PRs (no signing)
+          sha256sum "$CONSOLIDATED_MANIFEST" | cut -d ' ' -f1 > dist/consolidated-manifest.sha256
+          echo "Hash generated for PR validation (signing skipped)"
+        shell: bash
+
       - name: Emit ledger event to World Engine
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           set -euo pipefail
           HASH_VALUE=$(cat dist/consolidated-manifest.sha256)
@@ -81,7 +92,8 @@ jobs:
           LEDGER_API_KEY: ${{ secrets.LEDGER_API_KEY }}
           LEDGER_ENDPOINT: ${{ secrets.LEDGER_ENDPOINT }}
 
-      - name: Upload sealed artifacts
+      - name: Upload sealed artifacts (main only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: avatar-bindings-manifest
@@ -89,4 +101,14 @@ jobs:
             ${{ env.CONSOLIDATED_MANIFEST }}
             dist/consolidated-manifest.sha256
             dist/consolidated-manifest.sig
+          if-no-files-found: error
+
+      - name: Upload validation artifacts (PR only)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: avatar-bindings-manifest-validation
+          path: |
+            ${{ env.CONSOLIDATED_MANIFEST }}
+            dist/consolidated-manifest.sha256
           if-no-files-found: error

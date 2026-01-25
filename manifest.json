@@ -1,0 +1,24 @@
+{
+  "manifest_id": "ssot.qube.orchestrator.manifest",
+  "capsule": "qube.orchestrator.v1",
+  "version": 1,
+  "payload": {
+    "owner": "Q-Enterprises",
+    "operations": [
+      {
+        "type": "registry",
+        "target": "ssot.capsule.registry.v1"
+      },
+      {
+        "type": "link",
+        "ref": "manifest://qube.orchestrator.v1"
+      }
+    ],
+    "modules": [
+      "qube.qbert_query_parser",
+      "qube.moemodel.v1",
+      "capsule.shard.registry.v1",
+      "capsule.anomaly.trace.v1"
+    ]
+  }
+}
