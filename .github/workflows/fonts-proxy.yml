@@ -67,11 +67,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v6
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
           context: .
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          push: true
           tags: ghcr.io/${{ github.repository_owner }}/google-fonts-proxy:latest
-          load: ${{ github.event_name == 'pull_request' }}
+
+      - uses: docker/build-push-action@v6
+        if: github.event_name == 'pull_request'
+        with:
+          context: .
+          push: false
+          tags: google-fonts-proxy:pr-test
+          load: true
 
       # Container smoke tests (main branch with secrets)
       - name: Run container (main)
@@ -95,7 +103,7 @@ jobs:
           docker run -d --rm --name fonts-proxy \
             -e GOOGLE_FONTS_API_KEY=test-api-key \
             -e PROXY_KEY=test-proxy-key \
-            -p 8787:8787 ghcr.io/${{ github.repository_owner }}/google-fonts-proxy:latest
+            -p 8787:8787 google-fonts-proxy:pr-test
           until curl -fsS http://localhost:8787/healthz; do sleep 1; done
           curl -fsS -H "x-api-key: test-proxy-key" \
             "http://localhost:8787/api/fonts/list?sort=popularity" | jq '.items[0].family' -e
