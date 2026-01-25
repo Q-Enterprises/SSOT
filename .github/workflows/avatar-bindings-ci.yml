@@ -23,21 +23,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install --no-save ajv-cli
+          npm ci
           # Ensure pnpm version is locked if used elsewhere in the spine
           # pnpm@9.1.0 is the standard governance version
 
       - name: Validate source manifest
-        run: |
-          if [ ! -f manifest.json ]; then
-            echo "::error::manifest.json not found"
-            exit 1
-          fi
-          if [ ! -f schemas/manifest.schema.json ]; then
-            echo "::error::schemas/manifest.schema.json not found"
-            exit 1
-          fi
-          npx ajv validate -s schemas/manifest.schema.json -d manifest.json
+        run: node scripts/validate-manifest.js
         shell: bash
 
       - name: Consolidate manifest (Canonical RFC 8785)
