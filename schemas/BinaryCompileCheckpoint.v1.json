@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://q-enterprises.dev/schemas/BinaryCompileCheckpoint.v1.json",
+  "title": "Binary Compile Checkpoint v1",
+  "description": "Constitutional infrastructure for deterministic binary ingestion. Enforces fail-closed policy on staging, format, and compiler version.",
+  "type": "object",
+  "required": [
+    "checkpoint_id",
+    "raw_binary_url",
+    "raw_binary_sha256",
+    "staged_artifact_path",
+    "staged_artifact_sha256",
+    "compiler_version",
+    "compile_timestamp",
+    "node_id",
+    "determinism_proof"
+  ],
+  "properties": {
+    "checkpoint_id": {
+      "type": "string",
+      "description": "Unique checkpoint identifier",
+      "pattern": "^bcc_v1_[a-zA-Z0-9_-]+$"
+    },
+    "raw_binary_url": {
+      "type": "string",
+      "description": "URL to raw binary source",
+      "format": "uri"
+    },
+    "raw_binary_sha256": {
+      "type": "string",
+      "description": "SHA-256 hash of raw binary",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "staged_artifact_path": {
+      "type": "string",
+      "description": "Path to staged artifact"
+    },
+    "staged_artifact_sha256": {
+      "type": "string",
+      "description": "SHA-256 hash of staged artifact",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "compiler_version": {
+      "type": "string",
+      "description": "Compiler/toolchain version",
+      "pattern": "^v2026\\.GOLD_BURN"
+    },
+    "compile_timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp of compilation",
+      "format": "date-time"
+    },
+    "node_id": {
+      "type": "string",
+      "description": "Executing node identifier",
+      "pattern": "^beelink_ser8_[a-zA-Z0-9_-]+$"
+    },
+    "determinism_proof": {
+      "type": "object",
+      "description": "Proof of deterministic staging",
+      "required": [
+        "staging_method",
+        "format_version",
+        "reproducibility_hash"
+      ],
+      "properties": {
+        "staging_method": {
+          "type": "string",
+          "enum": ["direct", "compile", "transcode", "extract"],
+          "description": "Method used for staging"
+        },
+        "format_version": {
+          "type": "string",
+          "description": "Format version identifier"
+        },
+        "reproducibility_hash": {
+          "type": "string",
+          "description": "Hash proving reproducibility",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": true
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional metadata",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

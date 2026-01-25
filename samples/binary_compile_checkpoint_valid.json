@@ -1,0 +1,22 @@
+{
+  "checkpoint_id": "bcc_v1_courtroom_model_paper_20260125",
+  "raw_binary_url": "https://raw.githubusercontent.com/johnrepsys/courtroom-model/master/paper/main.pdf",
+  "raw_binary_sha256": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2",
+  "staged_artifact_path": "/var/ssot/staged/courtroom_model_paper_v1.pdf",
+  "staged_artifact_sha256": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3",
+  "compiler_version": "v2026.GOLD_BURN.1",
+  "compile_timestamp": "2026-01-25T17:30:00Z",
+  "node_id": "beelink_ser8_alpha_01",
+  "determinism_proof": {
+    "staging_method": "direct",
+    "format_version": "pdf-1.7",
+    "reproducibility_hash": "c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4"
+  },
+  "metadata": {
+    "source_repo": "johnrepsys/courtroom-model",
+    "branch": "master",
+    "commit": "latest",
+    "file_size_bytes": 245678,
+    "ingestion_reason": "Movie Ledger Court System constitutional document"
+  }
+}
