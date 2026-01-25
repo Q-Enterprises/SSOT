@@ -1,0 +1,5 @@
+extends: ["spectral:oas", "spectral:asyncapi"]
+rules:
+  operation-description: warn
+  operation-tags: warn
+  oas3-api-servers: warn

@@ -1,0 +1,195 @@
+openapi: 3.1.0
+info:
+  title: Google Fonts Proxy API
+  description: Proxy service for Google Fonts API with caching and rate limiting
+  version: 1.0.0
+  contact:
+    name: Q-Enterprises
+servers:
+  - url: http://localhost:8787
+    description: Local development
+  - url: https://fonts-proxy.q-enterprises.dev
+    description: Production
+security:
+  - ApiKeyAuth: []
+tags:
+  - name: Fonts
+    description: Font listing and file operations
+  - name: Health
+    description: Service health and monitoring
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key for authenticated requests
+
+  schemas:
+    FontItem:
+      type: object
+      properties:
+        family:
+          type: string
+          description: Font family name
+        category:
+          type: string
+          description: Font category (serif, sans-serif, display, etc.)
+        variants:
+          type: array
+          items:
+            type: string
+        subsets:
+          type: array
+          items:
+            type: string
+      required:
+        - family
+
+    FontListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FontItem'
+        kind:
+          type: string
+          example: webfonts#webfontList
+      required:
+        - items
+
+    FontFilesResponse:
+      type: object
+      properties:
+        items:
+          type: object
+          additionalProperties:
+            type: string
+            format: uri
+        kind:
+          type: string
+      required:
+        - items
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded, error]
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - status
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+      required:
+        - message
+
+paths:
+  /healthz:
+    get:
+      tags:
+        - Health
+      operationId: healthCheck
+      summary: Health check endpoint
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/fonts/list:
+    get:
+      tags:
+        - Fonts
+      operationId: listFonts
+      summary: List available fonts
+      parameters:
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [alpha, date, popularity, style, trending]
+          description: Sort order for fonts
+        - in: query
+          name: subset
+          schema:
+            type: string
+          description: Filter by subset (e.g., latin, cyrillic)
+      responses:
+        '200':
+          description: List of fonts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FontListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/fonts/files:
+    get:
+      tags:
+        - Fonts
+      operationId: getFontFiles
+      summary: Get font file URLs for a specific font family
+      parameters:
+        - in: query
+          name: family
+          required: true
+          schema:
+            type: string
+          description: Font family name
+          example: Inter
+      responses:
+        '200':
+          description: Font file URLs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FontFilesResponse'
+        '400':
+          description: Bad request - family parameter required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Font family not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
