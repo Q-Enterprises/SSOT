@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pathlib import Path
 import sys
 
@@ -42,7 +43,7 @@ def test_duration_seconds_empty_ledger_returns_zero():
     )
 
     assert ledger.duration_seconds() == 0.0
-from __future__ import annotations
+
 
 from pathlib import Path
 import sys
