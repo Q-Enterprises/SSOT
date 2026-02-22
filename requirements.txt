@@ -2,7 +2,6 @@
 # Add Python requirements here when introducing Python-based validation steps.
 requests
 pytest>=7.0.0
-fastapi
-httpx
-uvicorn
-pydantic>=2.0.0
+fastapi>=0.68.0
+httpx>=0.23.0
+pydantic<2.0.0
