@@ -3,12 +3,7 @@
   "router": {
     "avatar": "queen_boo",
     "checkpoint_ref": "queen_boo.chkpt.2025-09-24T10:34Z",
-    "policies": [
-      "maker_checker",
-      "no_drift",
-      "ssot_enforced",
-      "simulation_ready"
-    ]
+    "policies": ["maker_checker", "no_drift", "ssot_enforced", "simulation_ready"]
   },
   "stabilizer": {
     "avatar": "cici",
