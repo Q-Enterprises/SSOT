@@ -33,15 +33,17 @@ class AvatarRegistry:
         data = self._load()
         self._mesh: Dict[str, object] = data.get("mesh", {})
 
-        raw_avatars = data.get("avatars", [])
+        raw_avatars = data.get("avatars")
         if isinstance(raw_avatars, dict):
             self._avatars = []
             for name, details in raw_avatars.items():
                 if isinstance(details, dict):
                     details["name"] = name
                     self._avatars.append(details)
-        else:
+        elif isinstance(raw_avatars, list):
             self._avatars = raw_avatars
+        else:
+            self._avatars = []
 
         self._index = self._build_index(self._avatars)
         self._available_names = tuple(
