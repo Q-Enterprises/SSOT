@@ -1,5 +1,6 @@
 import pytest
 import uuid
+from unittest.mock import patch
 from docling_cluster import DriftReceipt, DocBlock, build_doc_blocks_from_drift
 
 def test_build_doc_blocks_happy_path():
