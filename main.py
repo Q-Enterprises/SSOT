@@ -282,7 +282,7 @@ app.add_middleware(
 # CORS Middleware: Standardize cross-origin resource sharing
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: In production, replace with specific origins
+    allow_origins=os.getenv("CORS_ALLOWED_ORIGINS", "").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
