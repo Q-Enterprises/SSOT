@@ -1,16 +1,17 @@
 import json
-import json
+import logging
+import os
+import subprocess
+from copy import deepcopy
+from datetime import datetime
 from pathlib import Path
 from time import time
+from typing import Dict, Iterable, List, Literal, Optional, Sequence
+from ipaddress import ip_address, ip_network
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
-from pathlib import Path
-from time import time
-from ipaddress import ip_address, ip_network
-import json
-from ipaddress import ip_address, ip_network
+from pydantic import BaseModel, Field
 
 from codex_validator import Credential, OverrideRequest, validate_payload
 from orchestrator.config import CAPSULE as ORCHESTRATOR_CAPSULE, FlowSubmission
@@ -34,7 +35,14 @@ class AvatarRegistry:
         self._path = registry_path
         data = self._load()
         self._mesh: Dict[str, object] = data.get("mesh", {})
-        self._avatars: List[Dict[str, object]] = data.get("avatars", [])
+        avatars_data = data.get("avatars", {})
+        self._avatars = []
+        if isinstance(avatars_data, list):
+            self._avatars = avatars_data
+        elif isinstance(avatars_data, dict):
+            for name, details in avatars_data.items():
+                details["name"] = name
+                self._avatars.append(details)
         self._index = self._build_index(self._avatars)
         self._available_names = tuple(
             avatar["name"]
@@ -473,7 +481,7 @@ def scrollstream_rehearsal(payload: ScrollstreamRehearsalRequest):
 async def credential_checker(request: Request):
     """Validate and process credential payloads.
 
-    Uses the Credential schema defined in `codex_validator` to enforce
+    Uses the Credential schema defined in  to enforce
     that incoming data includes the expected fields. If the data is
     valid, return the validated data; otherwise return validation
     errors. This helps fossilize credential flows as audit-grade
