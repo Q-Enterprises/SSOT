@@ -1,6 +1,6 @@
+from __future__ import annotations
 from pathlib import Path
 import sys
-
 import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -8,7 +8,6 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from previz.ledger import CameraState, MotionFrame, MotionLedger, SubjectPose
-
 
 def make_frame(frame_index: int) -> MotionFrame:
     return MotionFrame(
@@ -18,7 +17,6 @@ def make_frame(frame_index: int) -> MotionFrame:
         },
         camera=CameraState(pan=0.0, tilt=0.0, zoom=1.0),
     )
-
 
 def test_duration_seconds_handles_non_zero_start_frame():
     ledger = MotionLedger(
@@ -31,7 +29,6 @@ def test_duration_seconds_handles_non_zero_start_frame():
 
     assert ledger.duration_seconds() == pytest.approx((40 - 10) / 30)
 
-
 def test_duration_seconds_empty_ledger_returns_zero():
     ledger = MotionLedger(
         capsule_id="capsule",
@@ -42,3 +39,23 @@ def test_duration_seconds_empty_ledger_returns_zero():
     )
 
     assert ledger.duration_seconds() == 0.0
+
+def make_pose() -> SubjectPose:
+    return SubjectPose(x=0.0, y=0.0, yaw=0.0)
+
+def make_camera() -> CameraState:
+    return CameraState(pan=0.0, tilt=0.0, zoom=1.0)
+
+def test_duration_seconds_accounts_for_non_zero_start():
+    ledger = MotionLedger(
+        capsule_id="capsule",
+        scene="scene",
+        fps=10,
+        frames=[
+            MotionFrame(frame=10, cars={"car": make_pose()}, camera=make_camera()),
+            MotionFrame(frame=25, cars={"car": make_pose()}, camera=make_camera()),
+        ],
+        style_capsules=[],
+    )
+
+    assert ledger.duration_seconds() == pytest.approx((25 - 10) / 10)

@@ -7,7 +7,6 @@ const express = require('express');
 const app = express();
 
 const PORT = process.env.PORT || 8787;
-const GOOGLE_FONTS_API_KEY = process.env.GOOGLE_FONTS_API_KEY || '';
 const PROXY_KEY = process.env.PROXY_KEY || '';
 
 // Middleware

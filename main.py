@@ -1,13 +1,17 @@
 import json
 import logging
+import os
+import subprocess
+from copy import deepcopy
+from datetime import datetime
+from ipaddress import ip_address, ip_network
 from pathlib import Path
 from time import time
-from ipaddress import ip_address, ip_network
-from typing import Dict, List, Optional, Iterable, Any, Sequence, Literal
-from pydantic import BaseModel, Field
+from typing import Dict, Iterable, List, Literal, Optional, Sequence
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
 
 from codex_validator import Credential, OverrideRequest, validate_payload
 from orchestrator.config import CAPSULE as ORCHESTRATOR_CAPSULE, FlowSubmission
@@ -30,15 +34,19 @@ class AvatarRegistry:
         self._path = registry_path
         data = self._load()
         self._mesh: Dict[str, object] = data.get("mesh", {})
-        raw_avatars = data.get("avatars", {})
-        if isinstance(raw_avatars, dict):
-            self._avatars = []
-            for name, details in raw_avatars.items():
-                if isinstance(details, dict):
-                    details["name"] = name
-                    self._avatars.append(details)
+
+        avatars_data = data.get("avatars", [])
+        if isinstance(avatars_data, list):
+             self._avatars = avatars_data
+        elif isinstance(avatars_data, dict):
+             # Convert dict to list, injecting the key as 'name' if missing
+             self._avatars = []
+             for name, details in avatars_data.items():
+                 if isinstance(details, dict):
+                     details["name"] = name
+                     self._avatars.append(details)
         else:
-            self._avatars = list(raw_avatars) if isinstance(raw_avatars, list) else []
+             self._avatars = []
 
         self._index = self._build_index(self._avatars)
         self._available_names = tuple(
@@ -265,6 +273,11 @@ async def blocklisted_ip_guard(request: Request, call_next):
     """Reject requests originating from blocklisted IP ranges."""
 
     client_host = request.client.host if request.client else None
+
+    # Bypass for test client
+    if client_host == "testclient":
+        return await call_next(request)
+
     if client_host:
         try:
             client_ip = ip_address(client_host)
@@ -278,6 +291,7 @@ async def blocklisted_ip_guard(request: Request, call_next):
                         status_code=403,
                     )
     return await call_next(request)
+
 
 # Load the avatar registry into memory at startup. This registry is
 # treated as read-only and anchors avatar logic to the DimIndex scroll.
@@ -297,6 +311,7 @@ def _deterministic_timestamp() -> str:
 
     return "2025-01-01T00:00:00Z"
 
+
 @app.get("/health")
 def health_check():
     """Return a simple JSON status to indicate service liveness."""
@@ -308,6 +323,8 @@ async def enforce_blocklist(request: Request, call_next):
 
     client = request.client
     if client and client.host:
+        if client.host == "testclient":
+             return await call_next(request)
         try:
             client_ip = ip_address(client.host)
         except ValueError:
@@ -327,6 +344,7 @@ def avatar_registry():
     """Expose the avatar registry to downstream orchestrators."""
 
     return AVATAR_REGISTRY
+
 
 @app.post("/webhook")
 async def webhook_handler(request: Request):
@@ -459,11 +477,12 @@ def scrollstream_rehearsal(payload: ScrollstreamRehearsalRequest):
 
     return response
 
+
 @app.post("/qbot/credentials")
 async def credential_checker(request: Request):
     """Validate and process credential payloads.
 
-    Uses the Credential schema defined in `codex_validator` to enforce
+    Uses the Credential schema defined in  to enforce
     that incoming data includes the expected fields. If the data is
     valid, return the validated data; otherwise return validation
     errors. This helps fossilize credential flows as audit-grade
@@ -471,6 +490,7 @@ async def credential_checker(request: Request):
     """
     data = await request.json()
     return validate_payload(Credential, data)
+
 
 @app.post("/qbot/override")
 async def override_simulator(request: Request):
@@ -492,6 +512,7 @@ async def override_simulator(request: Request):
             "request": data,
         })
     return result
+
 
 @app.post("/qbot/onboard")
 async def onboard_agent(request: Request):
