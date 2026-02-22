@@ -85,6 +85,8 @@ class PrevizLibrary:
         self._load_index()
 
     def _load_index(self) -> None:
+        if not self._root.exists():
+            return
         for path in sorted(self._root.glob("*.json")):
             with path.open("r", encoding="utf-8") as handle:
                 payload = json.load(handle)
