@@ -1,3 +1,4 @@
+import logging
 import json
 import logging
 import os
@@ -54,8 +55,6 @@ class AvatarRegistry:
         )
 
     def _load(self) -> Dict[str, object]:
-        """Load registry data from disk, handling common failure cases."""
-
         if not self._path.exists():
             logger.warning("Avatar registry file is missing at %s", self._path)
             return {"mesh": {}, "avatars": []}

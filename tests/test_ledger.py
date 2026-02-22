@@ -12,18 +12,19 @@ from previz.ledger import CameraState, MotionFrame, MotionLedger, SubjectPose
 def make_frame(frame_index: int) -> MotionFrame:
     return MotionFrame(
         frame=frame_index,
-        cars={
-            "alpha": SubjectPose(x=1.0, y=2.0, yaw=3.0),
-        },
-        camera=CameraState(pan=0.0, tilt=0.0, zoom=1.0),
+        cars={"car": make_pose()},
+        camera=make_camera(),
     )
 
 def test_duration_seconds_handles_non_zero_start_frame():
     ledger = MotionLedger(
         capsule_id="capsule",
         scene="scene",
-        fps=30,
-        frames=[make_frame(10), make_frame(40)],
+        fps=10,
+        frames=[
+            make_frame(10),
+            make_frame(25),
+        ],
         style_capsules=[],
     )
 
