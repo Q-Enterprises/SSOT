@@ -48,7 +48,6 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           docker run -d --rm --name fonts-proxy \
-            -e GOOGLE_FONTS_API_KEY=${{ secrets.GOOGLE_FONTS_API_KEY }} \
             -e PROXY_KEY=${{ secrets.PROXY_KEY }} \
             -p 8787:8787 ghcr.io/${{ github.repository_owner }}/google-fonts-proxy:latest
           until curl -fsS http://localhost:8787/healthz; do sleep 1; done
@@ -65,7 +64,6 @@ jobs:
           set -e
           echo "Starting container..."
           docker run -d --rm --name fonts-proxy \
-            -e GOOGLE_FONTS_API_KEY=test-api-key \
             -e PROXY_KEY=test-proxy-key \
             -p 8787:8787 google-fonts-proxy:pr-test
           
