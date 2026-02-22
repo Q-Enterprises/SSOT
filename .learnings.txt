@@ -1,0 +1,4 @@
+- The local `pydantic` shim in `pydantic/__init__.py` was missing the `errors()` method on `ValidationError`.
+- This caused `codex_validator.validate_payload` to crash when validation failed.
+- Added `ValidationError.errors()` returning a list of dicts with a "msg" key.
+- Implemented tests in `tests/test_codex_validator.py` to verify validation logic and the shim fix.

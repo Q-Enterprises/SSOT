@@ -300,6 +300,7 @@ async def blocklisted_ip_guard(request: Request, call_next):
                     )
     return await call_next(request)
 
+
 # Load the avatar registry into memory at startup. This registry is
 # treated as read-only and anchors avatar logic to the DimIndex scroll.
 _registry_path = Path(__file__).resolve().parent / "avatar_registry.json"
@@ -319,6 +320,7 @@ def _deterministic_timestamp() -> str:
     """Return a stable timestamp used for deterministic rehearsal runs."""
 
     return "2025-01-01T00:00:00Z"
+
 
 @app.get("/health")
 def health_check():
@@ -355,6 +357,7 @@ def avatar_registry():
     """Expose the avatar registry to downstream orchestrators."""
 
     return AVATAR_REGISTRY
+
 
 @app.post("/webhook")
 async def webhook_handler(request: Request):
@@ -490,11 +493,12 @@ def scrollstream_rehearsal(payload: ScrollstreamRehearsalRequest):
 
     return response
 
+
 @app.post("/qbot/credentials")
 async def credential_checker(request: Request):
     """Validate and process credential payloads.
 
-    Uses the Credential schema defined in `codex_validator` to enforce
+    Uses the Credential schema defined in  to enforce
     that incoming data includes the expected fields. If the data is
     valid, return the validated data; otherwise return validation
     errors. This helps fossilize credential flows as audit-grade
@@ -502,6 +506,7 @@ async def credential_checker(request: Request):
     """
     data = await request.json()
     return validate_payload(Credential, data)
+
 
 @app.post("/qbot/override")
 async def override_simulator(request: Request):
@@ -523,6 +528,7 @@ async def override_simulator(request: Request):
             "request": data,
         })
     return result
+
 
 @app.post("/qbot/onboard")
 async def onboard_agent(request: Request):
