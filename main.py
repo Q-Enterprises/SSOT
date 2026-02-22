@@ -1,16 +1,17 @@
+import logging
 import json
-import json
+import os
+import subprocess
 from pathlib import Path
 from time import time
+from datetime import datetime
+from copy import deepcopy
+from typing import Dict, List, Iterable, Optional, Sequence, Literal
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
-from pathlib import Path
-from time import time
 from ipaddress import ip_address, ip_network
-import json
-from ipaddress import ip_address, ip_network
+from pydantic import BaseModel, Field
 
 from codex_validator import Credential, OverrideRequest, validate_payload
 from orchestrator.config import CAPSULE as ORCHESTRATOR_CAPSULE, FlowSubmission
@@ -34,7 +35,15 @@ class AvatarRegistry:
         self._path = registry_path
         data = self._load()
         self._mesh: Dict[str, object] = data.get("mesh", {})
-        self._avatars: List[Dict[str, object]] = data.get("avatars", [])
+        raw_avatars = data.get("avatars", [])
+        self._avatars = []
+        if isinstance(raw_avatars, dict):
+            for name, details in raw_avatars.items():
+                avatar = details.copy()
+                avatar["name"] = name
+                self._avatars.append(avatar)
+        elif isinstance(raw_avatars, list):
+             self._avatars = raw_avatars
         self._index = self._build_index(self._avatars)
         self._available_names = tuple(
             avatar["name"]
@@ -242,17 +251,6 @@ app = FastAPI()
 WORLD_ENGINE = WorldEngine()
 
 # Network block list enforcing council security guidance.
-_BLOCKED_NETWORKS = tuple(
-    ip_network(value)
-    for value in (
-        "3.134.238.10/32",
-        "3.129.111.220/32",
-        "52.15.118.168/32",
-        "74.220.50.0/24",
-        "74.220.58.0/24",
-    )
-)
-
 _BLOCKED_NETWORKS = [
     ip_network("3.134.238.10/32"),
     ip_network("3.129.111.220/32"),
@@ -263,23 +261,19 @@ _BLOCKED_NETWORKS = [
 
 
 @app.middleware("http")
-async def blocklisted_ip_guard(request: Request, call_next):
-    """Reject requests originating from blocklisted IP ranges."""
+async def enforce_blocklist(request: Request, call_next):
+    """Deny access to requests originating from blocked networks."""
 
-    client_host = request.client.host if request.client else None
-    if client_host:
+    client = request.client
+    if client and client.host:
         try:
-            client_ip = ip_address(client_host)
+            client_ip = ip_address(client.host)
         except ValueError:
             client_ip = None
-        if client_ip:
-            for network in _BLOCKED_NETWORKS:
-                if client_ip in network:
-                    return JSONResponse(
-                        {"detail": "Access denied from blocked network"},
-                        status_code=403,
-                    )
-    return await call_next(request)
+        if client_ip and any(client_ip in network for network in _BLOCKED_NETWORKS):
+            raise HTTPException(status_code=403, detail="request blocked")
+    response = await call_next(request)
+    return response
 
 # Load the avatar registry into memory at startup. This registry is
 # treated as read-only and anchors avatar logic to the DimIndex scroll.
@@ -305,22 +299,6 @@ def _deterministic_timestamp() -> str:
 def health_check():
     """Return a simple JSON status to indicate service liveness."""
     return {"status": "alive"}
-
-
-@app.middleware("http")
-async def enforce_blocklist(request: Request, call_next):
-    """Deny access to requests originating from blocked networks."""
-
-    client = request.client
-    if client and client.host:
-        try:
-            client_ip = ip_address(client.host)
-        except ValueError:
-            client_ip = None
-        if client_ip and any(client_ip in network for network in _BLOCKED_NETWORKS):
-            raise HTTPException(status_code=403, detail="request blocked")
-    response = await call_next(request)
-    return response
 
 
 @app.get("/healthz")
