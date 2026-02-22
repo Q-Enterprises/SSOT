@@ -1,16 +1,20 @@
 import json
-import json
+import logging
+import os
+import subprocess
+from datetime import datetime
+from ipaddress import ip_address, ip_network
 from pathlib import Path
 from time import time
+from typing import Dict, Iterable, List, Literal, Optional, Sequence, Any
+from copy import deepcopy
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pathlib import Path
-from time import time
-from ipaddress import ip_address, ip_network
-import json
-from ipaddress import ip_address, ip_network
+from pydantic import BaseModel, Field
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from codex_validator import Credential, OverrideRequest, validate_payload
 from orchestrator.config import CAPSULE as ORCHESTRATOR_CAPSULE, FlowSubmission
@@ -237,22 +241,7 @@ class ScrollstreamRehearsalEvent(BaseModel):
     emotional_payload: str
 
 
-app = FastAPI()
-
-WORLD_ENGINE = WorldEngine()
-
 # Network block list enforcing council security guidance.
-_BLOCKED_NETWORKS = tuple(
-    ip_network(value)
-    for value in (
-        "3.134.238.10/32",
-        "3.129.111.220/32",
-        "52.15.118.168/32",
-        "74.220.50.0/24",
-        "74.220.58.0/24",
-    )
-)
-
 _BLOCKED_NETWORKS = [
     ip_network("3.134.238.10/32"),
     ip_network("3.129.111.220/32"),
@@ -261,25 +250,69 @@ _BLOCKED_NETWORKS = [
     ip_network("74.220.58.0/24"),
 ]
 
+app = FastAPI()
 
-@app.middleware("http")
-async def blocklisted_ip_guard(request: Request, call_next):
-    """Reject requests originating from blocklisted IP ranges."""
+class IPBlocklistMiddleware(BaseHTTPMiddleware):
+    """Middleware to reject requests from blocklisted IP addresses."""
 
-    client_host = request.client.host if request.client else None
-    if client_host:
-        try:
-            client_ip = ip_address(client_host)
-        except ValueError:
-            client_ip = None
-        if client_ip:
-            for network in _BLOCKED_NETWORKS:
-                if client_ip in network:
+    async def dispatch(self, request: Request, call_next):
+        client_host = request.client.host if request.client else None
+        if client_host:
+            try:
+                client_ip = ip_address(client_host)
+                if any(client_ip in network for network in _BLOCKED_NETWORKS):
                     return JSONResponse(
                         {"detail": "Access denied from blocked network"},
                         status_code=403,
                     )
-    return await call_next(request)
+            except ValueError:
+                # Handle invalid IP addresses if necessary
+                pass
+        return await call_next(request)
+
+
+app.add_middleware(IPBlocklistMiddleware)
+
+# Trusted Host Middleware: Prevent HTTP Host Header attacks
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=os.getenv("ALLOWED_HOSTS", "localhost").split(","),
+)
+
+# CORS Middleware: Standardize cross-origin resource sharing
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.getenv("CORS_ALLOWED_ORIGINS", "").split(","),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# Security Headers Middleware: Defense-in-depth headers
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    """Add defense-in-depth security headers to every response."""
+    response = await call_next(request)
+    # Prevent browsers from guessing the content-type
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    # Prevent clickjacking
+    response.headers["X-Frame-Options"] = "DENY"
+    # Enable browser XSS filtering
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    # Enforce HTTPS
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    # Basic Content Security Policy
+    response.headers["Content-Security-Policy"] = "default-src 'self'"
+    # Referrer policy
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
+
+WORLD_ENGINE = WorldEngine()
+
+
+
 
 # Load the avatar registry into memory at startup. This registry is
 # treated as read-only and anchors avatar logic to the DimIndex scroll.
@@ -307,20 +340,6 @@ def health_check():
     return {"status": "alive"}
 
 
-@app.middleware("http")
-async def enforce_blocklist(request: Request, call_next):
-    """Deny access to requests originating from blocked networks."""
-
-    client = request.client
-    if client and client.host:
-        try:
-            client_ip = ip_address(client.host)
-        except ValueError:
-            client_ip = None
-        if client_ip and any(client_ip in network for network in _BLOCKED_NETWORKS):
-            raise HTTPException(status_code=403, detail="request blocked")
-    response = await call_next(request)
-    return response
 
 
 @app.get("/healthz")
