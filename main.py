@@ -481,7 +481,7 @@ def scrollstream_rehearsal(payload: ScrollstreamRehearsalRequest):
 async def credential_checker(request: Request):
     """Validate and process credential payloads.
 
-    Uses the Credential schema defined in  to enforce
+    Uses the Credential schema defined in `codex_validator` to enforce
     that incoming data includes the expected fields. If the data is
     valid, return the validated data; otherwise return validation
     errors. This helps fossilize credential flows as audit-grade
