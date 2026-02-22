@@ -23,6 +23,9 @@ __all__ = [
 class ValidationError(ValueError):
     """Exception raised when provided data cannot initialise a model."""
 
+    def errors(self) -> List[Dict[str, Any]]:
+        return [{"msg": str(self)}]
+
 
 @dataclass
 class _FieldInfo:
