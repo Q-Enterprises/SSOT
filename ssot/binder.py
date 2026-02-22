@@ -84,7 +84,6 @@ class RegistryEntry(BaseModel):
             "simulation",
             "storyboard",
         }
-        allowed = {"script", "storyboard", "asset", "clip", "checkpoint"}
         if value not in allowed:
             raise ValueError(f"entry type '{value}' is not part of the canonical binder")
         return value
@@ -96,7 +95,7 @@ class RegistryEntry(BaseModel):
         reproducible across runs and environments.
         """
 
-        serialized = self.json(by_alias=True, sort_keys=True, exclude={"notes"})
+        serialized = self.model_dump_json(by_alias=True, exclude={"notes"})
         return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 

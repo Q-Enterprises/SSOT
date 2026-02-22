@@ -1,15 +1,17 @@
-import json
+import logging
+import os
+import subprocess
+from copy import deepcopy
+from datetime import datetime
+from typing import Dict, List, Optional, Iterable, Sequence, Literal
+from pydantic import BaseModel, Field
+
 import json
 from pathlib import Path
 from time import time
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
-from pathlib import Path
-from time import time
-from ipaddress import ip_address, ip_network
-import json
 from ipaddress import ip_address, ip_network
 
 from codex_validator import Credential, OverrideRequest, validate_payload
@@ -34,7 +36,17 @@ class AvatarRegistry:
         self._path = registry_path
         data = self._load()
         self._mesh: Dict[str, object] = data.get("mesh", {})
-        self._avatars: List[Dict[str, object]] = data.get("avatars", [])
+
+        raw_avatars = data.get("avatars", [])
+        if isinstance(raw_avatars, dict):
+            self._avatars = []
+            for name, details in raw_avatars.items():
+                if isinstance(details, dict):
+                    details["name"] = name
+                    self._avatars.append(details)
+        else:
+            self._avatars = raw_avatars
+
         self._index = self._build_index(self._avatars)
         self._available_names = tuple(
             avatar["name"]
@@ -473,7 +485,7 @@ def scrollstream_rehearsal(payload: ScrollstreamRehearsalRequest):
 async def credential_checker(request: Request):
     """Validate and process credential payloads.
 
-    Uses the Credential schema defined in `codex_validator` to enforce
+    Uses the Credential schema defined in  to enforce
     that incoming data includes the expected fields. If the data is
     valid, return the validated data; otherwise return validation
     errors. This helps fossilize credential flows as audit-grade
