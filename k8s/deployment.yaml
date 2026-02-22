@@ -12,7 +12,6 @@ spec:
           image: ghcr.io/ORG/google-fonts-proxy:latest
           ports: [{ containerPort: 8787 }]
           env:
-            - { name: GOOGLE_FONTS_API_KEY, valueFrom: { secretKeyRef: { name: fonts-secrets, key: google_key } } }
             - { name: PROXY_KEY, valueFrom: { secretKeyRef: { name: fonts-secrets, key: proxy_key } } }
           readinessProbe: { httpGet: { path: /healthz, port: 8787 }, initialDelaySeconds: 2 }
           livenessProbe:  { httpGet: { path: /healthz, port: 8787 }, initialDelaySeconds: 5 }

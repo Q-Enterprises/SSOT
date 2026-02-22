@@ -10,12 +10,6 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from previz.ledger import CameraState, MotionFrame, MotionLedger, SubjectPose
 
-def make_pose() -> SubjectPose:
-    return SubjectPose(x=0.0, y=0.0, yaw=0.0)
-
-def make_camera() -> CameraState:
-    return CameraState(pan=0.0, tilt=0.0, zoom=1.0)
-
 def make_frame(frame_index: int) -> MotionFrame:
     return MotionFrame(
         frame=frame_index,
@@ -44,6 +38,12 @@ def test_duration_seconds_empty_ledger_returns_zero():
         style_capsules=[],
     )
     assert ledger.duration_seconds() == 0.0
+
+def make_pose() -> SubjectPose:
+    return SubjectPose(x=0.0, y=0.0, yaw=0.0)
+
+def make_camera() -> CameraState:
+    return CameraState(pan=0.0, tilt=0.0, zoom=1.0)
 
 def test_duration_seconds_accounts_for_non_zero_start():
     ledger = MotionLedger(

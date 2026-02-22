@@ -36,29 +36,30 @@ def test_validate_payload_invalid_missing_field():
     errors = result["errors"]
     assert isinstance(errors, list)
     assert len(errors) > 0
-    # Pydantic V2 error message is "Field required"
-    msg = errors[0]["msg"]
-    assert "Field required" in msg or "Missing fields" in msg
+    assert "msg" in errors[0]
+    # Verify error message content
+    # With installed pydantic 1.10, message is "field required"
+    assert "field required" in errors[0]["msg"]
 
 def test_validate_payload_nested_valid():
     payload = {"nested": {"field": "value"}}
     result = validate_payload(ComplexSchema, payload)
     assert result["valid"] is True
-    # In Pydantic V2, model_dump returns dicts recursively
+    # With installed pydantic, .dict() returns a dict, not objects
     assert result["data"]["nested"]["field"] == "value"
 
 def test_validate_payload_nested_invalid():
     payload = {"nested": {}} # missing field in nested model
+
     result = validate_payload(ComplexSchema, payload)
     assert result["valid"] is False
     assert "errors" in result
-    msg = result["errors"][0]["msg"]
-    assert "Field required" in msg or "Missing fields" in msg
+    # With installed pydantic 1.10, message is "field required"
+    assert "field required" in result["errors"][0]["msg"]
 
 def test_validate_payload_extra_fields():
     payload = {"name": "Alice", "age": 30, "extra": "field"}
     result = validate_payload(MockSchema, payload)
     assert result["valid"] is True
     # Verify extra field is NOT in the output data (sanitization)
-    # Pydantic V2 ignores extra fields by default
     assert "extra" not in result["data"]

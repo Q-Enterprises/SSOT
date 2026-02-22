@@ -69,8 +69,8 @@ class RegistryEntry(BaseModel):
     notes: Optional[str] = None
 
     class Config:
-        allow_population_by_field_name = True
-        anystr_strip_whitespace = True
+        populate_by_name = True
+        str_strip_whitespace = True
 
     @validator("entry_type")
     def validate_entry_type(cls, value: str) -> str:
@@ -84,7 +84,6 @@ class RegistryEntry(BaseModel):
             "simulation",
             "storyboard",
         }
-
         if value not in allowed:
             raise ValueError(f"entry type '{value}' is not part of the canonical binder")
         return value
@@ -97,7 +96,7 @@ class RegistryEntry(BaseModel):
         """
 
         data = self.model_dump(by_alias=True, exclude={"notes"}, mode="json")
-        serialized = json.dumps(data, sort_keys=True, ensure_ascii=False)
+        serialized = json.dumps(data, sort_keys=True)
         return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
@@ -109,8 +108,8 @@ class RegistryEnvelope(BaseModel):
     entries: List[RegistryEntry]
 
     class Config:
-        allow_population_by_field_name = True
-        anystr_strip_whitespace = True
+        populate_by_name = True
+        str_strip_whitespace = True
 
     @validator("entries")
     def ensure_sorted_entries(cls, value: Sequence[RegistryEntry]) -> List[RegistryEntry]:
@@ -185,12 +184,12 @@ class SSOTBinder:
 
         entries = []
         for entry in self._envelope.entries:
-            payload = entry.dict(by_alias=True)
+            payload = entry.model_dump(by_alias=True)
             payload["leaf_hash"] = entry.leaf_hash()
             entries.append(payload)
         return {
             "capsule_id": self.capsule_id,
-            "registry": self.registry.dict(),
+            "registry": self.registry.model_dump(),
             "entries": entries,
             "merkle_root": self.merkle_root,
         }
@@ -199,7 +198,7 @@ class SSOTBinder:
         """Validate a prospective entry and preview its Merkle root."""
 
         try:
-            candidate = RegistryEntry.parse_obj(candidate_data)
+            candidate = RegistryEntry.model_validate(candidate_data)
         except ValidationError as exc:
             return {"valid": False, "errors": exc.errors()}
 
@@ -216,7 +215,7 @@ class SSOTBinder:
             }
 
         preview_root = self._candidate_merkle_root(candidate)
-        payload = candidate.dict(by_alias=True)
+        payload = candidate.model_dump(by_alias=True)
         payload["leaf_hash"] = candidate.leaf_hash()
         return {"valid": True, "candidate": payload, "merkle_preview": preview_root}
 
@@ -247,7 +246,7 @@ def load_binder() -> SSOTBinder:
     path = _registry_path()
     with path.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
-    envelope = RegistryEnvelope.parse_obj(payload)
+    envelope = RegistryEnvelope.model_validate(payload)
     return SSOTBinder(envelope)
 
 
