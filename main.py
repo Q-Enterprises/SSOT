@@ -1,19 +1,17 @@
+import logging
 import json
-import json
+import os
+import subprocess
 from pathlib import Path
 from time import time
+from datetime import datetime
+from copy import deepcopy
+from typing import Dict, List, Iterable, Optional, Sequence, Literal
 
-from fastapi import FastAPI, HTTPException, Request
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
-from pathlib import Path
-from time import time
 from ipaddress import ip_address, ip_network
-import json
-from ipaddress import ip_address, ip_network
-
-from codex_validator import Credential, OverrideRequest, validate_payload
-from orchestrator.config import CAPSULE as ORCHESTRATOR_CAPSULE, FlowSubmission
+from pydantic import BaseModel, Field
 from previz.ledger import LIBRARY
 from previz.world_engine import WorldEngine
 from screenplay import LIBRARY as SCREENPLAY_LIBRARY
@@ -34,7 +32,15 @@ class AvatarRegistry:
         self._path = registry_path
         data = self._load()
         self._mesh: Dict[str, object] = data.get("mesh", {})
-        self._avatars: List[Dict[str, object]] = data.get("avatars", [])
+        raw_avatars = data.get("avatars", [])
+        self._avatars = []
+        if isinstance(raw_avatars, dict):
+            for name, details in raw_avatars.items():
+                avatar = details.copy()
+                avatar["name"] = name
+                self._avatars.append(avatar)
+        elif isinstance(raw_avatars, list):
+             self._avatars = raw_avatars
         self._index = self._build_index(self._avatars)
         self._available_names = tuple(
             avatar["name"]
@@ -43,8 +49,6 @@ class AvatarRegistry:
         )
 
     def _load(self) -> Dict[str, object]:
-        """Load registry data from disk, handling common failure cases."""
-
         if not self._path.exists():
             logger.warning("Avatar registry file is missing at %s", self._path)
             return {"mesh": {}, "avatars": []}
