@@ -1,16 +1,14 @@
 import json
-import json
+import logging
+from ipaddress import ip_address, ip_network
 from pathlib import Path
 from time import time
+from copy import deepcopy
+from typing import Dict, Iterable, List, Optional, Sequence, Literal
+from pydantic import BaseModel, Field
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
-from pathlib import Path
-from time import time
-from ipaddress import ip_address, ip_network
-import json
-from ipaddress import ip_address, ip_network
 
 from codex_validator import Credential, OverrideRequest, validate_payload
 from orchestrator.config import CAPSULE as ORCHESTRATOR_CAPSULE, FlowSubmission
@@ -34,7 +32,17 @@ class AvatarRegistry:
         self._path = registry_path
         data = self._load()
         self._mesh: Dict[str, object] = data.get("mesh", {})
-        self._avatars: List[Dict[str, object]] = data.get("avatars", [])
+
+        raw_avatars = data.get("avatars", [])
+        if isinstance(raw_avatars, dict):
+            self._avatars = []
+            for name, details in raw_avatars.items():
+                if isinstance(details, dict):
+                    details["name"] = name
+                    self._avatars.append(details)
+        else:
+            self._avatars = raw_avatars
+
         self._index = self._build_index(self._avatars)
         self._available_names = tuple(
             avatar["name"]
