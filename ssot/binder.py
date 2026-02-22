@@ -95,7 +95,8 @@ class RegistryEntry(BaseModel):
         reproducible across runs and environments.
         """
 
-        serialized = self.model_dump_json(by_alias=True, exclude={"notes"})
+        data = self.model_dump(by_alias=True, exclude={"notes"}, mode="json")
+        serialized = json.dumps(data, sort_keys=True)
         return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
