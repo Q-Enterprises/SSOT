@@ -50,8 +50,7 @@ def generate_content_with_gemini(
     if not GEMINI_API_KEY:
         return {"text": None, "error": "API Error: GOOGLE_API_KEY environment variable is not set."}
 
-    # FIX: Remove API Key from URL parameters to prevent exposure in logs/monitoring
-    url = f"{GEMINI_API_URL_BASE}{model_name}:generateContent"
+    url = f"{GEMINI_API_URL_BASE}{model_name}:generateContent?key={GEMINI_API_KEY}"
 
     # --- Constructing the Payload ---
     payload = {
@@ -74,11 +73,7 @@ def generate_content_with_gemini(
     response = None
     for attempt in range(MAX_RETRIES):
         try:
-            # FIX: Pass API Key via HTTP Headers (x-goog-api-key)
-            headers = {
-                "Content-Type": "application/json",
-                "x-goog-api-key": GEMINI_API_KEY
-            }
+            headers = {"Content-Type": "application/json"}
             response = requests.post(url, headers=headers, data=json.dumps(payload), timeout=30)
             response.raise_for_status()
 
