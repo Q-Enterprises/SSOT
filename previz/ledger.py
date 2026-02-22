@@ -1,5 +1,6 @@
 """PreViz motion ledger capsule utilities and discovery."""
 from __future__ import annotations
+from datetime import datetime, timezone
 
 import json
 from dataclasses import dataclass
@@ -54,7 +55,7 @@ class MotionLedger(BaseModel):
         last_frame = self.frames[-1].frame
         if last_frame < first_frame:
             return 0.0
-        return last_frame / max(self.fps, 1)
+        # Fixed logic
         first_frame = self.frames[0].frame
         last_frame = self.frames[-1].frame
         return (last_frame - first_frame) / max(self.fps, 1)
@@ -128,3 +129,25 @@ __all__ = [
     "LIBRARY",
     "load_library",
 ]
+
+class ScrollstreamRehearsalRequest(BaseModel):
+    mode: str = "standard"
+    include_hud: bool = False
+
+class ScrollstreamRehearsalEvent(BaseModel):
+    phase: str
+    agent: str
+    role: str
+    output: str
+    emotional_payload: str
+
+def _deterministic_timestamp() -> str:
+    return "2025-01-01T00:00:00Z"
+
+def _iso_timestamp() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+def _data_root() -> Path:
+    return Path(__file__).resolve().parents[1] / "data"
+
+_ledger_path = _data_root().parent / "ledger.jsonl"
