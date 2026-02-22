@@ -4,7 +4,6 @@
     "avatar": "queen_boo",
     "checkpoint_ref": "queen_boo.chkpt.2025-09-24T10:34Z",
     "policies": ["maker_checker", "no_drift", "ssot_enforced", "simulation_ready"]
-    "policies": ["maker_checker", "no_drift", "ssot_enforced"]
   },
   "stabilizer": {
     "avatar": "cici",
@@ -13,7 +12,6 @@
       "guidance_vector": "tiltshift.abs",
       "stability": "high",
       "simulation_overlay": "packnet_tams"
-      "stability": "high"
     }
   },
   "flow_order": [
@@ -24,6 +22,5 @@
     "clip_capsule",
     "relay_capsule",
     "simulation_overlay"
-    "relay_capsule"
   ]
 }
