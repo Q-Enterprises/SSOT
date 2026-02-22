@@ -1,70 +1,20 @@
-from pathlib import Path
-import sys
-
-import pytest
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
-from previz.ledger import CameraState, MotionFrame, MotionLedger, SubjectPose
-
-
-def make_frame(frame_index: int) -> MotionFrame:
-    return MotionFrame(
-        frame=frame_index,
-        cars={
-            "alpha": SubjectPose(x=1.0, y=2.0, yaw=3.0),
-        },
-        camera=CameraState(pan=0.0, tilt=0.0, zoom=1.0),
-    )
-
-
-def test_duration_seconds_handles_non_zero_start_frame():
-    ledger = MotionLedger(
-        capsule_id="capsule",
-        scene="scene",
-        fps=30,
-        frames=[make_frame(10), make_frame(40)],
-        style_capsules=[],
-    )
-
-    assert ledger.duration_seconds() == pytest.approx((40 - 10) / 30)
-
-
-def test_duration_seconds_empty_ledger_returns_zero():
-    ledger = MotionLedger(
-        capsule_id="capsule",
-        scene="scene",
-        fps=30,
-        frames=[],
-        style_capsules=[],
-    )
-
-    assert ledger.duration_seconds() == 0.0
 from __future__ import annotations
 
-from pathlib import Path
 import sys
 import types
-from typing import Any, Callable, Dict, Iterable, List, get_args, get_origin, get_type_hints
-
-import pytest
-
-_PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(_PROJECT_ROOT) not in sys.path:
-    sys.path.append(str(_PROJECT_ROOT))
 from pathlib import Path
-import sys
-import types
 from typing import Any, Callable, Dict, List, Tuple, get_args, get_origin, get_type_hints
 
 import pytest
 
-sys.path.append(str(Path(__file__).resolve().parents[1]))
+# Ensure project root is in sys.path
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 
 def _install_pydantic_stub() -> None:
+    """Mock Pydantic for environments where it is not installed."""
     if "pydantic" in sys.modules:
         return
 
@@ -74,59 +24,6 @@ def _install_pydantic_stub() -> None:
         def __init__(self, factory: Callable[[], Any]):
             self.factory = factory
 
-    def Field(*, default_factory: Callable[[], Any] | None = None, **_: Any) -> Any:
-        if default_factory is None:
-            raise TypeError("default_factory is required in this test stub")
-        return _DefaultFactory(default_factory)
-
-    def validator(*fields: str, **_: Any) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-        def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
-            func._validator_fields = fields  # type: ignore[attr-defined]
-            return func
-
-        return decorator
-
-    class BaseModel:
-        __validators__: Dict[str, Iterable[Callable[[type, Any], Any]]] = {}
-        _default_factories: Dict[str, Callable[[], Any]] = {}
-
-        def __init_subclass__(cls, **kwargs: Any) -> None:
-            super().__init_subclass__(**kwargs)
-            cls._default_factories = {}
-            cls.__validators__ = {}
-
-            for name, value in cls.__dict__.items():
-                if isinstance(value, _DefaultFactory):
-                    cls._default_factories[name] = value.factory
-
-            for attr in cls.__dict__.values():
-                fields = getattr(attr, "_validator_fields", ())
-                for field in fields:
-                    cls.__validators__.setdefault(field, []).append(attr)
-
-        def __init__(self, **data: Any) -> None:
-            annotations = get_type_hints(self.__class__)
-
-            for name, factory in self.__class__._default_factories.items():
-                if name not in data:
-                    data[name] = factory()
-
-            for name in annotations:
-                if name in data:
-                    value = self._convert_value(annotations[name], data[name])
-                else:
-                    value = getattr(self.__class__, name, None)
-                setattr(self, name, value)
-
-            for field, validators in self.__class__.__validators__.items():
-                value = getattr(self, field)
-                for validator_fn in validators:
-                    value = validator_fn(self.__class__, value)
-                setattr(self, field, value)
-
-        @classmethod
-        def parse_obj(cls, obj: Dict[str, Any]) -> "BaseModel":
-            return cls(**obj)
     class BaseModel:
         __validators__: Dict[str, List[Callable[[type, Any], Any]]] = {}
 
@@ -197,7 +94,7 @@ def _install_pydantic_stub() -> None:
 
     def Field(*, default_factory: Callable[[], Any] | None = None, **_: Any) -> Any:
         if default_factory is None:
-            raise ValueError("default_factory is required in this test stub")
+            return None
         return _DefaultFactory(default_factory)
 
     def validator(*fields: str, **_: Any) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
@@ -224,6 +121,33 @@ def make_pose() -> SubjectPose:
 
 def make_camera() -> CameraState:
     return CameraState(pan=0.0, tilt=0.0, zoom=1.0)
+
+
+def test_duration_seconds_handles_non_zero_start_frame():
+    ledger = MotionLedger(
+        capsule_id="capsule",
+        scene="scene",
+        fps=30,
+        frames=[
+            MotionFrame(frame=10, cars={"alpha": make_pose()}, camera=make_camera()),
+            MotionFrame(frame=40, cars={"alpha": make_pose()}, camera=make_camera()),
+        ],
+        style_capsules=[],
+    )
+
+    assert ledger.duration_seconds() == pytest.approx((40 - 10) / 30)
+
+
+def test_duration_seconds_empty_ledger_returns_zero():
+    ledger = MotionLedger(
+        capsule_id="capsule",
+        scene="scene",
+        fps=30,
+        frames=[],
+        style_capsules=[],
+    )
+
+    assert ledger.duration_seconds() == 0.0
 
 
 def test_duration_seconds_accounts_for_non_zero_start():

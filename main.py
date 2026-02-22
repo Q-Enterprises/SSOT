@@ -1,16 +1,17 @@
 import json
-import json
+import logging
+import os
+import subprocess
+from copy import deepcopy
+from datetime import datetime
+from ipaddress import ip_address, ip_network
 from pathlib import Path
 from time import time
+from typing import Dict, Iterable, List, Literal, Optional, Sequence
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
-from pathlib import Path
-from time import time
-from ipaddress import ip_address, ip_network
-import json
-from ipaddress import ip_address, ip_network
+from pydantic import BaseModel, Field
 
 from codex_validator import Credential, OverrideRequest, validate_payload
 from orchestrator.config import CAPSULE as ORCHESTRATOR_CAPSULE, FlowSubmission
@@ -253,33 +254,25 @@ _BLOCKED_NETWORKS = tuple(
     )
 )
 
-_BLOCKED_NETWORKS = [
-    ip_network("3.134.238.10/32"),
-    ip_network("3.129.111.220/32"),
-    ip_network("52.15.118.168/32"),
-    ip_network("74.220.50.0/24"),
-    ip_network("74.220.58.0/24"),
-]
-
 
 @app.middleware("http")
 async def blocklisted_ip_guard(request: Request, call_next):
     """Reject requests originating from blocklisted IP ranges."""
 
-    client_host = request.client.host if request.client else None
-    if client_host:
+    client = request.client
+    if client and client.host:
         try:
-            client_ip = ip_address(client_host)
+            client_ip = ip_address(client.host)
         except ValueError:
             client_ip = None
-        if client_ip:
-            for network in _BLOCKED_NETWORKS:
-                if client_ip in network:
-                    return JSONResponse(
-                        {"detail": "Access denied from blocked network"},
-                        status_code=403,
-                    )
+
+        if client_ip and any(client_ip in network for network in _BLOCKED_NETWORKS):
+            return JSONResponse(
+                {"detail": "Access denied from blocked network"},
+                status_code=403,
+            )
     return await call_next(request)
+
 
 # Load the avatar registry into memory at startup. This registry is
 # treated as read-only and anchors avatar logic to the DimIndex scroll.
@@ -301,26 +294,11 @@ def _deterministic_timestamp() -> str:
 
     return "2025-01-01T00:00:00Z"
 
+
 @app.get("/health")
 def health_check():
     """Return a simple JSON status to indicate service liveness."""
     return {"status": "alive"}
-
-
-@app.middleware("http")
-async def enforce_blocklist(request: Request, call_next):
-    """Deny access to requests originating from blocked networks."""
-
-    client = request.client
-    if client and client.host:
-        try:
-            client_ip = ip_address(client.host)
-        except ValueError:
-            client_ip = None
-        if client_ip and any(client_ip in network for network in _BLOCKED_NETWORKS):
-            raise HTTPException(status_code=403, detail="request blocked")
-    response = await call_next(request)
-    return response
 
 
 @app.get("/healthz")
@@ -334,6 +312,7 @@ def avatar_registry():
     """Expose the avatar registry to downstream orchestrators."""
 
     return AVATAR_REGISTRY
+
 
 @app.post("/webhook")
 async def webhook_handler(request: Request):
@@ -469,6 +448,7 @@ def scrollstream_rehearsal(payload: ScrollstreamRehearsalRequest):
 
     return response
 
+
 @app.post("/qbot/credentials")
 async def credential_checker(request: Request):
     """Validate and process credential payloads.
@@ -481,6 +461,7 @@ async def credential_checker(request: Request):
     """
     data = await request.json()
     return validate_payload(Credential, data)
+
 
 @app.post("/qbot/override")
 async def override_simulator(request: Request):
@@ -502,6 +483,7 @@ async def override_simulator(request: Request):
             "request": data,
         })
     return result
+
 
 @app.post("/qbot/onboard")
 async def onboard_agent(request: Request):
