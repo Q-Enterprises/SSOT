@@ -276,7 +276,7 @@ app.add_middleware(IPBlocklistMiddleware)
 # Trusted Host Middleware: Prevent HTTP Host Header attacks
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["*"],  # TODO: In production, replace with specific allowed domains
+    allowed_hosts=os.getenv("ALLOWED_HOSTS", "localhost").split(","),
 )
 
 # CORS Middleware: Standardize cross-origin resource sharing
