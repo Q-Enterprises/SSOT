@@ -40,7 +40,7 @@ class AvatarRegistry:
                 avatar["name"] = name
                 self._avatars.append(avatar)
         elif isinstance(raw_avatars, list):
-             self._avatars = raw_avatars
+            self._avatars = raw_avatars
         self._index = self._build_index(self._avatars)
         self._available_names = tuple(
             avatar["name"]
