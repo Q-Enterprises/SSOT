@@ -1,5 +1,6 @@
-# Placeholder dependency file to satisfy CI environment setup.
-# Add Python requirements here when introducing Python-based validation steps.
 requests
 pytest>=7.0.0
-pydantic<2
+fastapi
+uvicorn
+pydantic
+httpx
