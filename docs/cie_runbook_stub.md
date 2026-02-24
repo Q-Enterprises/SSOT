@@ -22,9 +22,6 @@
 5. **Model Policy Affirmation**
    - Confirm `runtime_guardrails.model_policy.perturbation_models` is set to `neutral_only` in `content_integrity_eval.json`.
    - Verify no adversarial or unvetted model sources are referenced in module configs or operator overrides.
-6. **Legacy Flow Lockout**
-   - Confirm no runbooks or schedulers reference legacy CNE/FSV modules.
-   - Record lockout confirmation in `cie_v1.audit_report.md` metadata.
 
 ## 3. Execution Procedure
 1. **Noise Injector Pass**
