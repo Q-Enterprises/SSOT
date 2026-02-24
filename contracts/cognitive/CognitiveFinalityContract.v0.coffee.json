@@ -1,0 +1,62 @@
+{
+  "version": "CognitiveFinalityContract.v0",
+  "arc_id": "ARC-COFFEE-001-GENESIS",
+  "agent_id": "CoffeeAgent_Prime",
+  "state_model": {
+    "state_space": "LifecycleTensor.TENSOR-COFFEE-001",
+    "invariants": [
+      "Worldline continuity preserved",
+      "No ghost geometry introduced",
+      "State transitions must be tensor-addressable and replay-court reconstructible"
+    ]
+  },
+  "decision_model": {
+    "transition_type": "phase_transition",
+    "required_evidence": [
+      "pre_state_hash",
+      "post_state_hash",
+      "applied_policy_id",
+      "telemetry_event_ref"
+    ]
+  },
+  "logging_requirements": {
+    "event_schema": "AgentEvent.v1",
+    "minimum_fields": [
+      "arc_id",
+      "agent_id",
+      "decision_id",
+      "pre_state_ref",
+      "post_state_ref",
+      "timestamp",
+      "invariants_status"
+    ]
+  },
+  "finality_conditions": {
+    "allowed_states": [
+      "analysis_complete",
+      "recommendation_ready"
+    ],
+    "required_checks": [
+      "all_invariants_satisfied",
+      "no_drift_flags_raised",
+      "telemetry_log_complete"
+    ]
+  },
+  "drift_detection": {
+    "detection_mode": "hybrid",
+    "thresholds": {
+      "max_divergence": 0.15,
+      "max_entropy_delta": 0.10
+    },
+    "actions": [
+      "abort_decision",
+      "emit_drift_alert",
+      "require_human_review"
+    ]
+  },
+  "provenance": {
+    "created_at": "2026-01-19T13:30:00Z",
+    "created_by": "SovereignOS.v4.2",
+    "manifold_version": "Sovereign_Manifold_v4.2"
+  }
+}
