@@ -39,5 +39,5 @@ def test_webhook_handler_invalid_json():
 def test_webhook_handler_missing_content_type():
     """Test webhook with missing Content-Type header but valid JSON body."""
     response = client.post("/webhook", content='{"action": "test_content_type"}')
-    assert response.status_code == 200
-    assert response.json() == {"received": True, "event": "test_content_type"}
+    assert response.status_code == 400
+    assert "Content-Type" in response.json()["detail"]
