@@ -84,7 +84,9 @@ class UnityMLOpsOrchestrator:
         unity_build_command: Optional[List[str]] = None,
         mlagents_train_command: Optional[List[str]] = None,
     ) -> None:
-        self.workspace_dir = Path(workspace_dir)
+        # Normalize workspace to an absolute path so any child subprocess that
+        # runs with a different cwd still receives stable filesystem paths.
+        self.workspace_dir = Path(workspace_dir).resolve()
         self.workspace_dir.mkdir(parents=True, exist_ok=True)
         self.llm_code_generator = llm_code_generator
         self.webhook_notifier = webhook_notifier
