@@ -259,7 +259,7 @@ class UnityMLOpsOrchestrator:
 def _next_cron_time(cron_expression: str, base: datetime) -> datetime:
     """Compute next UTC run for a basic 5-field cron expression.
 
-    Supported tokens: `*` or exact integer values.
+    Supported tokens: `*`, exact integers, ranges (e.g. `8-17`), lists (e.g. `1,15,30`), and steps (e.g. `*/15`).
     """
 
     if croniter is not None:
