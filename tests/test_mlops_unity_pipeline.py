@@ -100,3 +100,92 @@ Path(os.environ['MLAGENTS_OUTPUT_MODEL']).write_bytes(b'external-model')
 
     result = asyncio.run(orchestrator.execute_training_job(job))
     assert Path(result.trained_model_path).read_bytes() == b"external-model"
+
+
+def test_unity_build_command_receives_absolute_paths(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    relative_workspace = Path("artifacts") / "mlops"
+
+    script_path = tmp_path / "capture_build_args.py"
+    args_file = tmp_path / "build_args.json"
+    script_path.write_text(
+        f"""
+import json
+import sys
+from pathlib import Path
+
+Path({str(args_file)!r}).write_text(json.dumps(sys.argv[1:]), encoding='utf-8')
+""".strip(),
+        encoding="utf-8",
+    )
+
+    orchestrator = UnityMLOpsOrchestrator(
+        workspace_dir=relative_workspace,
+        unity_build_command=["python", str(script_path)],
+    )
+    job = TrainingJob(
+        job_id="job-build-abs",
+        asset_spec=UnityAssetSpec(
+            asset_id="asset-build-abs",
+            name="BuildBot",
+            asset_type="behavior",
+            description="Verify build args",
+        ),
+        rl_config=RLTrainingConfig(max_steps=1),
+    )
+
+    asyncio.run(orchestrator.execute_training_job(job))
+
+    import json
+
+    build_args = json.loads(args_file.read_text(encoding="utf-8"))
+    assert Path(build_args[0]).is_absolute()
+    assert Path(build_args[1]).is_absolute()
+
+
+def test_train_agent_external_command_uses_absolute_env_paths(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    relative_workspace = Path("artifacts") / "mlops"
+
+    script_path = tmp_path / "capture_train_env.py"
+    env_file = tmp_path / "train_env.json"
+    script_path.write_text(
+        f"""
+import json
+import os
+from pathlib import Path
+
+payload = {{
+    'UNITY_BUILD_PATH': os.environ['UNITY_BUILD_PATH'],
+    'MLAGENTS_CONFIG_PATH': os.environ['MLAGENTS_CONFIG_PATH'],
+    'MLAGENTS_OUTPUT_MODEL': os.environ['MLAGENTS_OUTPUT_MODEL'],
+}}
+Path({str(env_file)!r}).write_text(json.dumps(payload), encoding='utf-8')
+Path(os.environ['MLAGENTS_OUTPUT_MODEL']).write_bytes(b'external-model')
+""".strip(),
+        encoding="utf-8",
+    )
+
+    orchestrator = UnityMLOpsOrchestrator(
+        workspace_dir=relative_workspace,
+        mlagents_train_command=["python", str(script_path)],
+    )
+    job = TrainingJob(
+        job_id="job-train-abs",
+        asset_spec=UnityAssetSpec(
+            asset_id="asset-train-abs",
+            name="TrainBot",
+            asset_type="behavior",
+            description="Verify training env",
+        ),
+        rl_config=RLTrainingConfig(max_steps=1),
+    )
+
+    asyncio.run(orchestrator.execute_training_job(job))
+
+    import json
+
+    train_env = json.loads(env_file.read_text(encoding="utf-8"))
+    assert Path(train_env["UNITY_BUILD_PATH"]).is_absolute()
+    assert Path(train_env["MLAGENTS_CONFIG_PATH"]).is_absolute()
+    assert Path(train_env["MLAGENTS_OUTPUT_MODEL"]).is_absolute()

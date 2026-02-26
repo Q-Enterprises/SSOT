@@ -137,9 +137,15 @@ class UnityMLOpsOrchestrator:
         build_marker.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
         if self.unity_build_command:
+            code_path_for_subprocess = code_path.resolve()
+            build_dir_for_subprocess = build_dir.resolve()
             await asyncio.to_thread(
                 subprocess.run,
-                [*self.unity_build_command, str(code_path), str(build_dir)],
+                [
+                    *self.unity_build_command,
+                    str(code_path_for_subprocess),
+                    str(build_dir_for_subprocess),
+                ],
                 check=True,
                 cwd=str(job_dir),
             )
@@ -173,9 +179,9 @@ class UnityMLOpsOrchestrator:
 
         if self.mlagents_train_command:
             env = os.environ.copy()
-            env["UNITY_BUILD_PATH"] = str(build_path)
-            env["MLAGENTS_CONFIG_PATH"] = str(config_path)
-            env["MLAGENTS_OUTPUT_MODEL"] = str(model_path)
+            env["UNITY_BUILD_PATH"] = str(build_path.resolve())
+            env["MLAGENTS_CONFIG_PATH"] = str(config_path.resolve())
+            env["MLAGENTS_OUTPUT_MODEL"] = str(model_path.resolve())
             await asyncio.to_thread(
                 subprocess.run,
                 self.mlagents_train_command,
