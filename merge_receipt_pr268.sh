@@ -219,8 +219,8 @@ HASH_SURFACE_JSON="$(cat <<JSON
     "number":${PR_NUMBER},
     "url":$(printf "%s" "$PR_URL" | json_escape),
     "title":$(printf "%s" "$PR_TITLE" | json_escape),
-    "base_ref":"${BASE_BRANCH}",
-    "head_ref":"${HEAD_BRANCH}"
+    "base_ref":$(printf "%s" "$BASE_BRANCH" | json_escape),
+    "head_ref":$(printf "%s" "$HEAD_BRANCH" | json_escape)
   },
   "pointers":{
     "base_before":"${BASE_BEFORE_SHA}",
