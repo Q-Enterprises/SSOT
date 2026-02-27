@@ -23,6 +23,17 @@ def test_cron_fallback_supports_steps_and_ranges():
     assert next_run == datetime(2025, 1, 1, 0, 15, tzinfo=timezone.utc)
 
 
+def test_cron_fallback_supports_stepped_fields_with_explicit_start():
+    from mlops_unity_pipeline import _next_cron_time
+
+    base = datetime(2025, 1, 1, 0, 0, tzinfo=timezone.utc)
+    next_run = _next_cron_time("1/5 * * * *", base)
+    assert next_run == datetime(2025, 1, 1, 0, 1, tzinfo=timezone.utc)
+
+    following_run = _next_cron_time("1/5 * * * *", next_run)
+    assert following_run == datetime(2025, 1, 1, 0, 6, tzinfo=timezone.utc)
+
+
 def test_orchestrator_executes_training_job(tmp_path):
     orchestrator = UnityMLOpsOrchestrator(workspace_dir=tmp_path)
     job = TrainingJob(
