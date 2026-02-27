@@ -130,7 +130,7 @@ MERGE_COMMIT_SHA=""
 MERGE_STATUS="unknown"
 
 set +e
-git merge "${HEAD_REMOTE_REF}" --no-ff -m "Merge PR #${PR_NUMBER}: handshake lifecycle endpoints" >/dev/null 2>&1
+MERGE_OUTPUT="$(git merge "${HEAD_REMOTE_REF}" --no-ff -m "Merge PR #${PR_NUMBER}: handshake lifecycle endpoints" 2>&1)"
 MERGE_RC=$?
 set -e
 
@@ -141,7 +141,7 @@ if [ "$MERGE_RC" -ne 0 ]; then
     die "Merge conflicts detected. Resolve conflicts, then run: git commit && re-run this script with SKIP_MERGE=1"
   else
     MERGE_STATUS="failed"
-    die "Merge failed (rc=$MERGE_RC). Inspect git output and retry."
+    die "Merge failed (rc=$MERGE_RC). Inspect git output and retry. Output:\n${MERGE_OUTPUT}"
   fi
 else
   MERGE_STATUS="merged"
