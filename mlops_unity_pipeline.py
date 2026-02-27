@@ -316,6 +316,8 @@ def _expand_cron_field(token: str, minimum: int, maximum: int) -> set[int]:
         elif "-" in part:
             start_text, end_text = part.split("-", 1)
             start, end = int(start_text), int(end_text)
+        elif step != 1:
+            start, end = int(part), maximum
         else:
             start = end = int(part)
 
