@@ -52,6 +52,54 @@ You’ve already pinned the Proof → Flow → Execution braid. Here’s the fin
 
 ---
 
+## CI Workflows
+
+### ✅ CI Workflow: Manifest Validation Example
+
+In CI, manifest schema validation is enforced via a Bash step using `ajv-cli`. Here's a real example of how it runs:
+
+```bash
+set -euo pipefail
+trap 'echo "::error::Manifest schema validation failed"' ERR
+
+MANIFEST_PATH="${CONSOLIDATED_MANIFEST:-manifest.json}"
+
+if [ ! -f "$MANIFEST_PATH" ]; then
+  if [ -f samples/manifest.json ]; then
+    echo "::notice::Using samples/manifest.json as fallback"
+    MANIFEST_PATH="samples/manifest.json"
+  else
+    echo "::error::manifest not found at $MANIFEST_PATH"
+    exit 1
+  fi
+fi
+
+npx --yes ajv-cli validate -d "$MANIFEST_PATH"
+```
+
+**Key points:**
+
+* Fails fast (`set -euo pipefail`) and emits GitHub Actions errors for easier debugging.
+* Uses `$CONSOLIDATED_MANIFEST` when provided (e.g., `dist/consolidated-manifest.json`), otherwise defaults to `manifest.json`; falls back to `samples/manifest.json` if present.
+* Uses `ajv-cli` to validate the file against the expected schema.
+* If the file is missing, it raises a CI error (`exit code 1`).
+
+**GitHub Actions context:**
+This is typically embedded in a job like:
+
+```yaml
+jobs:
+  validate-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          set -euo pipefail
+          # [script above]
+```
+
+---
+
 ## Relay flow you can “bash” (no coding)
 
 - **Stage and seal in SSOT:** Export JSON + media; compute SHA‑256; build Merkle; collect council signatures (≥4 of 6, maker≠checker); freeze entry. If quorum deadlocks, Dot routes override; Sol.F1 refuses cascade until SSOT continuity passes.
