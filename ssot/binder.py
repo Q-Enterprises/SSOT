@@ -16,7 +16,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
-from pydantic import BaseModel, Field, ValidationError, validator
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
 # ---------------------------------------------------------------------------
 # Pydantic models describing the SSOT registry entries and context
@@ -69,11 +69,14 @@ class RegistryEntry(BaseModel):
     notes: Optional[str] = None
 
     class Config:
+        """Pydantic config."""
         populate_by_name = True
         str_strip_whitespace = True
 
-    @validator("entry_type")
+    @field_validator("entry_type")
+    @classmethod
     def validate_entry_type(cls, value: str) -> str:
+        """Validate the canonical registry entry types."""
         allowed = {
             "asset",
             "checkpoint",
@@ -109,11 +112,14 @@ class RegistryEnvelope(BaseModel):
     entries: List[RegistryEntry]
 
     class Config:
+        """Pydantic config."""
         populate_by_name = True
         str_strip_whitespace = True
 
-    @validator("entries")
+    @field_validator("entries")
+    @classmethod
     def ensure_sorted_entries(cls, value: Sequence[RegistryEntry]) -> List[RegistryEntry]:
+        """Keep entries sorted locally by artifact_id before sealing."""
         return sorted(value, key=lambda entry: entry.artifact_id)
 
 
@@ -136,6 +142,7 @@ class MerkleTree:
     leaves: List[str]
 
     def root(self) -> str:
+        """Compute the root hash."""
         if not self.leaves:
             return ""
         level = self.leaves[:]
@@ -163,21 +170,26 @@ class SSOTBinder:
 
     @property
     def capsule_id(self) -> str:
+        """Return the capsule id."""
         return self._envelope.capsule_id
 
     @property
     def registry(self) -> RegistryContext:
+        """Return the registry context."""
         return self._envelope.registry
 
     @property
     def entries(self) -> List[RegistryEntry]:
+        """Return a copy of the entries list."""
         return list(self._envelope.entries)
 
     @property
     def merkle_root(self) -> str:
+        """Return the calculated Merkle root."""
         return self._merkle.root()
 
     def get_entry(self, artifact_id: str) -> Optional[RegistryEntry]:
+        """Fetch an entry by its artifact id."""
         return self._entry_map.get(artifact_id)
 
     def as_dict(self) -> Dict[str, object]:
