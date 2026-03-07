@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "test": "echo \"No tests specified\" && exit 0"
+    "test": "echo \"No tests specified\" && exit 0",
+    "build": "echo \"No build step required\""
   },
   "keywords": ["fonts", "proxy", "google-fonts", "cache"],
   "author": "Q-Enterprises",
