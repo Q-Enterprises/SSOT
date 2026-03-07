@@ -87,7 +87,6 @@ class RegistryEntry(BaseModel):
             "simulation",
             "storyboard",
         }
-        allowed = {"script", "storyboard", "asset", "clip", "checkpoint"}
         if value not in allowed:
             raise ValueError(f"entry type '{value}' is not part of the canonical binder")
         return value
