@@ -16,7 +16,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
-from pydantic import BaseModel, Field, ValidationError, validator
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
 # ---------------------------------------------------------------------------
 # Pydantic models describing the SSOT registry entries and context
@@ -69,11 +69,14 @@ class RegistryEntry(BaseModel):
     notes: Optional[str] = None
 
     class Config:
-        allow_population_by_field_name = True
-        anystr_strip_whitespace = True
+        """Pydantic config."""
+        populate_by_name = True
+        str_strip_whitespace = True
 
-    @validator("entry_type")
+    @field_validator("entry_type")
+    @classmethod
     def validate_entry_type(cls, value: str) -> str:
+        """Validate the canonical registry entry types."""
         allowed = {
             "asset",
             "checkpoint",
@@ -96,7 +99,8 @@ class RegistryEntry(BaseModel):
         reproducible across runs and environments.
         """
 
-        serialized = self.json(by_alias=True, sort_keys=True, exclude={"notes"})
+        data = self.model_dump(by_alias=True, exclude={"notes"}, mode="json")
+        serialized = json.dumps(data, sort_keys=True)
         return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
@@ -108,11 +112,14 @@ class RegistryEnvelope(BaseModel):
     entries: List[RegistryEntry]
 
     class Config:
-        allow_population_by_field_name = True
-        anystr_strip_whitespace = True
+        """Pydantic config."""
+        populate_by_name = True
+        str_strip_whitespace = True
 
-    @validator("entries")
+    @field_validator("entries")
+    @classmethod
     def ensure_sorted_entries(cls, value: Sequence[RegistryEntry]) -> List[RegistryEntry]:
+        """Keep entries sorted locally by artifact_id before sealing."""
         return sorted(value, key=lambda entry: entry.artifact_id)
 
 
@@ -135,6 +142,7 @@ class MerkleTree:
     leaves: List[str]
 
     def root(self) -> str:
+        """Compute the root hash."""
         if not self.leaves:
             return ""
         level = self.leaves[:]
@@ -162,21 +170,26 @@ class SSOTBinder:
 
     @property
     def capsule_id(self) -> str:
+        """Return the capsule id."""
         return self._envelope.capsule_id
 
     @property
     def registry(self) -> RegistryContext:
+        """Return the registry context."""
         return self._envelope.registry
 
     @property
     def entries(self) -> List[RegistryEntry]:
+        """Return a copy of the entries list."""
         return list(self._envelope.entries)
 
     @property
     def merkle_root(self) -> str:
+        """Return the calculated Merkle root."""
         return self._merkle.root()
 
     def get_entry(self, artifact_id: str) -> Optional[RegistryEntry]:
+        """Fetch an entry by its artifact id."""
         return self._entry_map.get(artifact_id)
 
     def as_dict(self) -> Dict[str, object]:
@@ -184,12 +197,12 @@ class SSOTBinder:
 
         entries = []
         for entry in self._envelope.entries:
-            payload = entry.dict(by_alias=True)
+            payload = entry.model_dump(by_alias=True)
             payload["leaf_hash"] = entry.leaf_hash()
             entries.append(payload)
         return {
             "capsule_id": self.capsule_id,
-            "registry": self.registry.dict(),
+            "registry": self.registry.model_dump(),
             "entries": entries,
             "merkle_root": self.merkle_root,
         }
@@ -198,7 +211,7 @@ class SSOTBinder:
         """Validate a prospective entry and preview its Merkle root."""
 
         try:
-            candidate = RegistryEntry.parse_obj(candidate_data)
+            candidate = RegistryEntry.model_validate(candidate_data)
         except ValidationError as exc:
             return {"valid": False, "errors": exc.errors()}
 
@@ -215,7 +228,7 @@ class SSOTBinder:
             }
 
         preview_root = self._candidate_merkle_root(candidate)
-        payload = candidate.dict(by_alias=True)
+        payload = candidate.model_dump(by_alias=True)
         payload["leaf_hash"] = candidate.leaf_hash()
         return {"valid": True, "candidate": payload, "merkle_preview": preview_root}
 
@@ -246,7 +259,7 @@ def load_binder() -> SSOTBinder:
     path = _registry_path()
     with path.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
-    envelope = RegistryEnvelope.parse_obj(payload)
+    envelope = RegistryEnvelope.model_validate(payload)
     return SSOTBinder(envelope)
 
 
