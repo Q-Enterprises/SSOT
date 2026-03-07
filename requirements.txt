@@ -1,2 +1,5 @@
-# Placeholder dependency file to satisfy CI environment setup.
-# Add Python requirements here when introducing Python-based validation steps.
+fastapi>=0.110,<1
+pydantic>=2.8,<3
+PyYAML>=6.0,<7
+requests>=2.31,<3
+pytest>=8.0,<10

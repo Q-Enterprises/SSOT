@@ -75,7 +75,6 @@ jobs:
       - name: Run container
         run: |
           docker run -d --rm --name fonts-proxy \
-            -e GOOGLE_FONTS_API_KEY=${{ secrets.GOOGLE_FONTS_API_KEY }} \
             -e PROXY_KEY=${{ secrets.PROXY_KEY }} \
             -p 8787:8787 ghcr.io/${{ github.repository_owner }}/google-fonts-proxy:latest
           until curl -fsS http://localhost:8787/healthz; do sleep 1; done
@@ -83,4 +82,41 @@ jobs:
             "http://localhost:8787/api/fonts/list?sort=popularity" | jq '.items[0].family' -e
           curl -fsS -H "x-api-key: ${{ secrets.PROXY_KEY }}" \
             "http://localhost:8787/api/fonts/files?family=Inter" | jq '.items | type' -e
+          docker stop fonts-proxy
+
+      # Container smoke tests (PR with mock values)
+      - name: Run container (PR)
+        if: github.event_name == 'pull_request'
+        run: |
+          set -e
+          echo "Starting container..."
+          docker run -d --rm --name fonts-proxy \
+            -e PROXY_KEY=test-proxy-key \
+            -p 8787:8787 google-fonts-proxy:pr-test
+          
+          echo "Waiting for container to be healthy..."
+          for i in {1..30}; do
+            if curl -fsS http://localhost:8787/healthz 2>/dev/null; then
+              echo "Container is healthy!"
+              break
+            fi
+            echo "Attempt $i/30: Container not ready yet..."
+            sleep 1
+            if [ $i -eq 30 ]; then
+              echo "Container failed to become healthy"
+              docker logs fonts-proxy
+              docker stop fonts-proxy || true
+              exit 1
+            fi
+          done
+          
+          echo "Testing font list endpoint..."
+          curl -fsS -H "x-api-key: test-proxy-key" \
+            "http://localhost:8787/api/fonts/list?sort=popularity" | jq '.items[0].family' -e
+          
+          echo "Testing font files endpoint..."
+          curl -fsS -H "x-api-key: test-proxy-key" \
+            "http://localhost:8787/api/fonts/files?family=Inter" | jq '.items | type' -e
+          
+          echo "Stopping container..."
           docker stop fonts-proxy

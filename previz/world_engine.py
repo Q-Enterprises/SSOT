@@ -13,8 +13,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import hashlib
 import json
+from pydantic import BaseModel
+from pydantic import BaseModel
 import time
-from typing import Dict, List, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 
 def _utc_timestamp() -> str:
@@ -1138,3 +1140,13 @@ if __name__ == "__main__":  # pragma: no cover - convenience CLI
     print("\n--- Adjudication Capsule ---")
     print(f"Adjudication Capsule ID: {adjudication_capsule.capsule_id}")
     print(f"Adjudication Digest: {adjudication_capsule.digest}")
+
+class MediaGenerationRequest(BaseModel):
+    media_type: str
+    prompt: str
+    metadata: Optional[Dict[str, Any]] = None
+
+class MediaGenerationRequest(BaseModel):
+    media_type: str
+    prompt: str
+    metadata: Optional[Dict[str, Any]] = None
