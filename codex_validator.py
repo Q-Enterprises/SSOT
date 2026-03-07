@@ -24,6 +24,6 @@ def validate_payload(schema: Type[BaseModel], payload: Dict[str, Any]) -> Dict[s
 
     try:
         validated = schema(**payload)
-        return {"valid": True, "data": validated.dict()}
+        return {"valid": True, "data": validated.model_dump()}
     except ValidationError as exc:
         return {"valid": False, "errors": exc.errors()}
