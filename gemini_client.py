@@ -71,14 +71,13 @@ def generate_content_with_gemini(
         payload["config"]["responseSchema"] = json_schema
 
     # --- Exponential Backoff Logic (Zero-Drift Compliance) ---
+    headers = {
+        "Content-Type": "application/json",
+        "x-goog-api-key": GEMINI_API_KEY
+    }
     response = None
     for attempt in range(MAX_RETRIES):
         try:
-            # FIX: Pass API Key via HTTP Headers (x-goog-api-key)
-            headers = {
-                "Content-Type": "application/json",
-                "x-goog-api-key": GEMINI_API_KEY
-            }
             response = requests.post(url, headers=headers, data=json.dumps(payload), timeout=30)
             response.raise_for_status()
 
