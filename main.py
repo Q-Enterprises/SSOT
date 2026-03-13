@@ -1,18 +1,4 @@
-import logging
 import json
-<<<<<<< HEAD
-import os
-import subprocess
-from pathlib import Path
-from time import time
-from datetime import datetime
-from copy import deepcopy
-from typing import Dict, List, Iterable, Optional, Sequence, Literal
-
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
-from ipaddress import ip_address, ip_network
-=======
 import logging
 import os
 import subprocess
@@ -25,7 +11,6 @@ from typing import Dict, Iterable, List, Literal, Optional, Sequence
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
->>>>>>> main
 from pydantic import BaseModel, Field
 
 from codex_validator import Credential, OverrideRequest, validate_payload
@@ -37,6 +22,7 @@ from ssot.binder import binder
 from qube.merkle_orchestrator import MERKLE_ORCHESTRATOR, MerkleSealRequest
 
 logger = logging.getLogger(__name__)
+
 class AvatarRegistry:
     """In-memory representation of the avatar dossier registry.
 
@@ -49,17 +35,6 @@ class AvatarRegistry:
         self._path = registry_path
         data = self._load()
         self._mesh: Dict[str, object] = data.get("mesh", {})
-<<<<<<< HEAD
-        raw_avatars = data.get("avatars", [])
-        self._avatars = []
-        if isinstance(raw_avatars, dict):
-            for name, details in raw_avatars.items():
-                avatar = details.copy()
-                avatar["name"] = name
-                self._avatars.append(avatar)
-        elif isinstance(raw_avatars, list):
-             self._avatars = raw_avatars
-=======
 
         avatars_data = data.get("avatars", [])
         if isinstance(avatars_data, list):
@@ -74,7 +49,6 @@ class AvatarRegistry:
         else:
              self._avatars = []
 
->>>>>>> main
         self._index = self._build_index(self._avatars)
         self._available_names = tuple(
             avatar.get("name")
@@ -276,22 +250,18 @@ app = FastAPI()
 WORLD_ENGINE = WorldEngine()
 
 # Network block list enforcing council security guidance.
-_BLOCKED_NETWORKS = [
+_BLOCKED_NETWORKS = (
     ip_network("3.134.238.10/32"),
     ip_network("3.129.111.220/32"),
     ip_network("52.15.118.168/32"),
     ip_network("74.220.50.0/24"),
     ip_network("74.220.58.0/24"),
-]
+)
 
 @app.middleware("http")
-async def enforce_blocklist(request: Request, call_next):
+async def blocklisted_ip_guard(request: Request, call_next):
     """Deny access to requests originating from blocked networks."""
 
-<<<<<<< HEAD
-    client = request.client
-    if client and client.host:
-=======
     client_host = request.client.host if request.client else None
 
     # Bypass for test client
@@ -299,13 +269,15 @@ async def enforce_blocklist(request: Request, call_next):
         return await call_next(request)
 
     if client_host:
->>>>>>> main
         try:
-            client_ip = ip_address(client.host)
+            client_ip = ip_address(client_host)
         except ValueError:
             client_ip = None
         if client_ip and any(client_ip in network for network in _BLOCKED_NETWORKS):
-            raise HTTPException(status_code=403, detail="request blocked")
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "Access denied from blocked network"}
+            )
     response = await call_next(request)
     return response
 
@@ -333,26 +305,6 @@ def _deterministic_timestamp() -> str:
 def health_check():
     """Return a simple JSON status to indicate service liveness."""
     return {"status": "alive"}
-
-<<<<<<< HEAD
-=======
-@app.middleware("http")
-async def enforce_blocklist(request: Request, call_next):
-    """Deny access to requests originating from blocked networks."""
-
-    client = request.client
-    if client and client.host:
-        if client.host == "testclient":
-             return await call_next(request)
-        try:
-            client_ip = ip_address(client.host)
-        except ValueError:
-            client_ip = None
-        if client_ip and any(client_ip in network for network in _BLOCKED_NETWORKS):
-            raise HTTPException(status_code=403, detail="request blocked")
-    response = await call_next(request)
-    return response
->>>>>>> main
 
 @app.get("/healthz")
 def readiness_check():
