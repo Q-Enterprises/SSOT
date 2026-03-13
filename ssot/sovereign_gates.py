@@ -175,17 +175,20 @@ def extract_invariants(
     """Gate: ReplayCapsule.v1 -> InvariantSet.v1 (EXTRACT_INVARIANTS)."""
     if not capsule.receipts:
         raise GateError("ReplayCapsule must include at least one receipt")
-    sorted_ticks = [receipt.tick for receipt in capsule.receipts]
-    if sorted_ticks != sorted(sorted_ticks):
-        raise GateError("Receipts must be sorted by ascending tick")
-    if len(sorted_ticks) != len(set(sorted_ticks)):
-        raise GateError("Receipts must not include duplicate ticks")
-    for index, receipt in enumerate(capsule.receipts):
-        if index == 0:
-            continue
-        prev = capsule.receipts[index - 1]
-        if receipt.prev_tick_hash != prev.tick_hash:
+
+    it = iter(capsule.receipts)
+    prev_receipt = next(it)
+
+    for receipt in it:
+        if receipt.tick <= prev_receipt.tick:
+            if receipt.tick < prev_receipt.tick:
+                raise GateError("Receipts must be sorted by ascending tick")
+            raise GateError("Receipts must not include duplicate ticks")
+
+        if receipt.prev_tick_hash != prev_receipt.tick_hash:
             raise GateError("Receipt chain integrity failure: prev_tick_hash mismatch")
+
+        prev_receipt = receipt
     merkle_root = _psp_merkle_root(capsule.receipts)
     attestation = ExtractorAttestation(
         extractor_version=extractor_version,
