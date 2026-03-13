@@ -1,4 +1,3 @@
-import hashlib
 from ssot.ledger_emitter import merkle_root_from_leaves, _leaf_hash, _node_hash, _empty_root, sha256_digest
 
 def test_merkle():
