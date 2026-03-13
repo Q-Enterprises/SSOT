@@ -1,4 +1,4 @@
-import logging
+import asyncio
 import json
 import logging
 import os
@@ -152,7 +152,7 @@ class MerkleSealOrchestrator:
         if not os.access(self._script_path, os.X_OK):
             raise PermissionError(f"Seal helper is not executable: {self._script_path}")
 
-    def seal(
+    async def seal(
         self,
         merkle_root: str,
         capsule_id: str,
@@ -166,29 +166,33 @@ class MerkleSealOrchestrator:
         if metadata:
             env["MERKLE_METADATA"] = json.dumps(metadata)
 
-        result = subprocess.run(
-            command,
-            check=False,
-            capture_output=True,
-            text=True,
+        process = await asyncio.create_subprocess_exec(
+            *command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
             env=env,
         )
+        stdout_bytes, stderr_bytes = await process.communicate()
+        returncode = process.returncode
 
-        if result.returncode != 0:
+        stdout = stdout_bytes.decode().strip()
+        stderr = stderr_bytes.decode().strip()
+
+        if returncode != 0:
             raise RuntimeError(
                 "Seal helper failed",
                 {
-                    "returncode": result.returncode,
-                    "stdout": result.stdout,
-                    "stderr": result.stderr,
+                    "returncode": returncode,
+                    "stdout": stdout,
+                    "stderr": stderr,
                 },
             )
 
         return {
             "capsule": capsule_id,
             "merkle_root": merkle_root,
-            "stdout": result.stdout.strip(),
-            "stderr": result.stderr.strip(),
+            "stdout": stdout,
+            "stderr": stderr,
             "script": str(self._script_path),
         }
 
@@ -359,11 +363,11 @@ async def webhook_handler(request: Request):
     return {"received": True, "event": payload.get("action", "unknown")}
 
 @app.post("/merkle/seal")
-def merkle_seal(payload: MerkleSealRequest):
+async def merkle_seal(payload: MerkleSealRequest):
     """Trigger the Boo council seal helper via the Merkle orchestrator."""
 
     try:
-        result = MERKLE_ORCHESTRATOR.seal(
+        result = await MERKLE_ORCHESTRATOR.seal(
             payload.merkle_root,
             payload.capsule_id,
             payload.metadata,
