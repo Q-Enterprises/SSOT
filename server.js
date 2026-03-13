@@ -3,11 +3,17 @@
  * Provides caching and rate limiting for Google Fonts API
  */
 
+const PROXY_KEY = process.env.PROXY_KEY;
+
+if (!PROXY_KEY) {
+  console.error('ERROR: PROXY_KEY environment variable is required');
+  process.exit(1);
+}
+
 const express = require('express');
 const app = express();
 
 const PORT = process.env.PORT || 8787;
-const PROXY_KEY = process.env.PROXY_KEY || '';
 
 // Middleware
 app.use(express.json());
