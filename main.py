@@ -250,24 +250,13 @@ app = FastAPI()
 WORLD_ENGINE = WorldEngine()
 
 # Network block list enforcing council security guidance.
-_BLOCKED_NETWORKS = tuple(
-    ip_network(value)
-    for value in (
-        "3.134.238.10/32",
-        "3.129.111.220/32",
-        "52.15.118.168/32",
-        "74.220.50.0/24",
-        "74.220.58.0/24",
-    )
-)
-
-_BLOCKED_NETWORKS = [
+_BLOCKED_NETWORKS = (
     ip_network("3.134.238.10/32"),
     ip_network("3.129.111.220/32"),
     ip_network("52.15.118.168/32"),
     ip_network("74.220.50.0/24"),
     ip_network("74.220.58.0/24"),
-]
+)
 
 @app.middleware("http")
 async def blocklisted_ip_guard(request: Request, call_next):
@@ -284,13 +273,11 @@ async def blocklisted_ip_guard(request: Request, call_next):
             client_ip = ip_address(client_host)
         except ValueError:
             client_ip = None
-        if client_ip:
-            for network in _BLOCKED_NETWORKS:
-                if client_ip in network:
-                    return JSONResponse(
-                        {"detail": "Access denied from blocked network"},
-                        status_code=403,
-                    )
+        if client_ip and any(client_ip in network for network in _BLOCKED_NETWORKS):
+            return JSONResponse(
+                {"detail": "Access denied from blocked network"},
+                status_code=403,
+            )
     return await call_next(request)
 
 
@@ -317,23 +304,6 @@ def _deterministic_timestamp() -> str:
 def health_check():
     """Return a simple JSON status to indicate service liveness."""
     return {"status": "alive"}
-
-@app.middleware("http")
-async def enforce_blocklist(request: Request, call_next):
-    """Deny access to requests originating from blocked networks."""
-
-    client = request.client
-    if client and client.host:
-        if client.host == "testclient":
-             return await call_next(request)
-        try:
-            client_ip = ip_address(client.host)
-        except ValueError:
-            client_ip = None
-        if client_ip and any(client_ip in network for network in _BLOCKED_NETWORKS):
-            raise HTTPException(status_code=403, detail="request blocked")
-    response = await call_next(request)
-    return response
 
 @app.get("/healthz")
 def readiness_check():
